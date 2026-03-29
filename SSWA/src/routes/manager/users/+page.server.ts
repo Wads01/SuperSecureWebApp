@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { UserRole, UserStatus } from '../../../../generated/prisma/enums';
 import { prisma } from '$lib/server/db';
 import { assertAllowedPath, canManageUser } from '$lib/server/authorization/policy';
-import { writeSecurityLog } from '$lib/server/logging/security-log';
+import { logValidationFailure, writeSecurityLog } from '$lib/server/logging/security-log';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	assertAllowedPath(url.pathname, locals.user);
@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-	setStatus: async ({ request, locals, url }) => {
+	setStatus: async ({ request, locals, url, getClientAddress }) => {
 		assertAllowedPath(url.pathname, locals.user);
 
 		const formData = await request.formData();
@@ -50,10 +50,28 @@ export const actions: Actions = {
 		const nextStatus = String(formData.get('nextStatus') ?? '');
 
 		if (!targetUserId || !nextStatus) {
+			await logValidationFailure({
+				actorUserId: locals.user.id,
+				route: url.pathname,
+				ip: getClientAddress(),
+				userAgent: request.headers.get('user-agent'),
+				reason: 'missing_required_fields',
+				fields: ['targetUserId', 'nextStatus']
+			});
+
 			return fail(400, { error: 'targetUserId and nextStatus are required.' });
 		}
 
 		if (nextStatus !== UserStatus.ACTIVE && nextStatus !== UserStatus.DISABLED) {
+			await logValidationFailure({
+				actorUserId: locals.user.id,
+				route: url.pathname,
+				ip: getClientAddress(),
+				userAgent: request.headers.get('user-agent'),
+				reason: 'invalid_status_value',
+				fields: ['nextStatus']
+			});
+
 			return fail(400, { error: 'Invalid status value.' });
 		}
 
@@ -67,6 +85,15 @@ export const actions: Actions = {
 		});
 
 		if (!targetUser) {
+			await logValidationFailure({
+				actorUserId: locals.user.id,
+				route: url.pathname,
+				ip: getClientAddress(),
+				userAgent: request.headers.get('user-agent'),
+				reason: 'target_user_not_found',
+				fields: ['targetUserId']
+			});
+
 			return fail(404, { error: 'User not found.' });
 		}
 

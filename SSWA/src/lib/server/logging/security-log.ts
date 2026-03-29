@@ -45,3 +45,26 @@ export async function writeSecurityLog(params: {
 		// Never interrupt main request flow if logging fails.
 	}
 }
+
+export async function logValidationFailure(params: {
+	actorUserId?: string;
+	route: string;
+	ip?: string | null;
+	userAgent?: string | null;
+	reason: string;
+	fields?: string[];
+}): Promise<void> {
+	await writeSecurityLog({
+		actorUserId: params.actorUserId,
+		eventType: 'VALIDATION',
+		outcome: 'FAILURE',
+		route: params.route,
+		ip: params.ip,
+		userAgent: params.userAgent,
+		metadataJson: {
+			reason: params.reason,
+			fields: params.fields ?? []
+		}
+	});
+}
+

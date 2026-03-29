@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { login } from '$lib/server/auth/service';
 import { setSessionCookie } from '$lib/server/auth/session';
+import { logValidationFailure } from '$lib/server/logging/security-log';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -12,12 +13,21 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, getClientAddress, cookies, url }) => {
+	default: async ({ request, getClientAddress, cookies, url, locals }) => {
 		const formData = await request.formData();
 		const email = String(formData.get('email') ?? '');
 		const password = String(formData.get('password') ?? '');
 
 		if (!email || !password) {
+			await logValidationFailure({
+				actorUserId: locals.user?.id,
+				route: url.pathname,
+				ip: getClientAddress(),
+				userAgent: request.headers.get('user-agent'),
+				reason: 'missing_required_fields',
+				fields: ['email', 'password']
+			});
+
 			return fail(400, { error: 'Email and password are required.' });
 		}
 

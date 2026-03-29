@@ -1,4 +1,4 @@
-import { redirect, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
 import { getSessionFromToken } from '$lib/server/auth/service';
 import { SESSION_COOKIE_NAME } from '$lib/server/auth/session';
 import { isAllowedPath } from '$lib/server/authorization/policy';
@@ -57,4 +57,24 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	return resolve(event);
+};
+
+export const handleError: HandleServerError = async ({ error, event }) => {
+	await writeSecurityLog({
+		actorUserId: event.locals.user?.id,
+		eventType: 'TASK_CRUD',
+		outcome: 'FAILURE',
+		route: event.url.pathname,
+		ip: event.getClientAddress(),
+		userAgent: event.request.headers.get('user-agent'),
+		metadataJson: {
+			reason: 'unhandled_server_error'
+		}
+	});
+
+	console.error(error);
+
+	return {
+		message: 'Something went wrong. Please try again later.'
+	};
 };
