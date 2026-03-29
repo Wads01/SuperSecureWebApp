@@ -1,6 +1,7 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { getSessionFromToken } from '$lib/server/auth/service';
 import { SESSION_COOKIE_NAME } from '$lib/server/auth/session';
+import { isAllowedPath } from '$lib/server/authorization/policy';
 
 const PUBLIC_PATH_PREFIXES = ['/login', '/register', '/forgot-password'];
 
@@ -31,6 +32,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (!event.locals.user && !publicPath) {
 		throw redirect(303, '/login');
+	}
+
+	if (event.locals.user && !publicPath && !isAllowedPath(pathname, event.locals.user)) {
+		throw redirect(303, '/forbidden');
 	}
 
 	if (event.locals.user && (pathname === '/login' || pathname === '/register')) {

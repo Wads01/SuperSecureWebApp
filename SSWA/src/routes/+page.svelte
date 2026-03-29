@@ -12,6 +12,13 @@
 			<p><span class="font-medium">Status:</span> {data.user.status}</p>
 		</div>
 
+		<nav class="flex flex-wrap gap-2">
+			<a href="/manager/users" class="rounded border px-3 py-2">User Management</a>
+			{#if data.user.role === 'ADMIN'}
+				<a href="/admin/logs" class="rounded border px-3 py-2">Security Logs</a>
+			{/if}
+		</nav>
+
 		<form method="POST" action="/logout">
 			<button type="submit" class="rounded bg-black px-3 py-2 text-white">Sign out</button>
 		</form>
