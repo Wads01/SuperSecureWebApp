@@ -14,12 +14,16 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@prisma/client": "^7.6.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.50.2",
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@tailwindcss/vite": "^4.1.18",
 		"@types/node": "^25.5.0",
+		"@types/pg": "^8.20.0",
 		"dotenv": "^17.3.1",
+		"install": "^0.13.0",
+		"npm": "^11.12.1",
 		"prettier": "^3.8.1",
 		"prettier-plugin-svelte": "^3.4.1",
 		"prettier-plugin-tailwindcss": "^0.7.2",
@@ -31,8 +35,10 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@prisma/adapter-pg": "^7.6.0",
 		"bits-ui": "^2.16.4",
 		"lucide-svelte": "^1.0.1",
+		"pg": "^8.20.0",
 		"zod": "^4.3.6"
 	}
 }
