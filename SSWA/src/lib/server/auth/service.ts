@@ -1,5 +1,4 @@
 import { UserRole, UserStatus } from '../../../../generated/prisma/enums';
-import type { Prisma } from '../../../../generated/prisma/client';
 import { prisma } from '$lib/server/db';
 import { hashPassword, verifyPassword } from '$lib/server/auth/password';
 import {
@@ -7,6 +6,7 @@ import {
 	generateSessionToken,
 	hashSessionToken
 } from '$lib/server/auth/session';
+import { writeSecurityLog } from '$lib/server/logging/security-log';
 
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
@@ -43,43 +43,6 @@ function toAuthUser(user: {
 		status: user.status,
 		scopeId: user.scopeId
 	};
-}
-
-async function writeSecurityLog(params: {
-	actorUserId?: string;
-	eventType:
-		| 'AUTH_LOGIN'
-		| 'AUTH_LOGOUT'
-		| 'AUTH_REGISTER'
-		| 'AUTH_PASSWORD_CHANGE'
-		| 'AUTH_PASSWORD_RESET'
-		| 'AUTH_REAUTH'
-		| 'AUTH_LOCKOUT'
-		| 'AUTHZ_ACCESS'
-		| 'VALIDATION'
-		| 'TASK_CRUD'
-		| 'USER_MANAGEMENT';
-	outcome: 'SUCCESS' | 'FAILURE' | 'DENIED';
-	route?: string;
-	ip?: string | null;
-	userAgent?: string | null;
-	metadataJson?: Record<string, unknown>;
-}): Promise<void> {
-	try {
-		await prisma.securityLog.create({
-			data: {
-				actorUserId: params.actorUserId,
-				eventType: params.eventType,
-				outcome: params.outcome,
-				route: params.route,
-				ip: params.ip,
-				userAgent: params.userAgent,
-				metadataJson: params.metadataJson as Prisma.InputJsonValue | undefined
-			}
-		});
-	} catch {
-		// Do not break auth flow if log writing fails.
-	}
 }
 
 async function createSession(userId: string, context: SecurityContext): Promise<string> {

@@ -2,6 +2,7 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import { getSessionFromToken } from '$lib/server/auth/service';
 import { SESSION_COOKIE_NAME } from '$lib/server/auth/session';
 import { isAllowedPath } from '$lib/server/authorization/policy';
+import { writeSecurityLog } from '$lib/server/logging/security-log';
 
 const PUBLIC_PATH_PREFIXES = ['/login', '/register', '/forgot-password'];
 
@@ -35,6 +36,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (event.locals.user && !publicPath && !isAllowedPath(pathname, event.locals.user)) {
+		await writeSecurityLog({
+			actorUserId: event.locals.user.id,
+			eventType: 'AUTHZ_ACCESS',
+			outcome: 'DENIED',
+			route: pathname,
+			ip: event.getClientAddress(),
+			userAgent: event.request.headers.get('user-agent'),
+			metadataJson: {
+				reason: 'route_policy_denied',
+				role: event.locals.user.role
+			}
+		});
+
 		throw redirect(303, '/forbidden');
 	}
 

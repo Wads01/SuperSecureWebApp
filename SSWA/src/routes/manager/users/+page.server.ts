@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { UserRole, UserStatus } from '../../../../generated/prisma/enums';
 import { prisma } from '$lib/server/db';
 import { assertAllowedPath, canManageUser } from '$lib/server/authorization/policy';
+import { writeSecurityLog } from '$lib/server/logging/security-log';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	assertAllowedPath(url.pathname, locals.user);
@@ -70,6 +71,19 @@ export const actions: Actions = {
 		}
 
 		if (!canManageUser(locals.user, targetUser)) {
+			await writeSecurityLog({
+				actorUserId: locals.user.id,
+				eventType: 'AUTHZ_ACCESS',
+				outcome: 'DENIED',
+				route: url.pathname,
+				metadataJson: {
+					reason: 'scope_or_role_restriction',
+					targetUserId: targetUser.id,
+					targetUserRole: targetUser.role,
+					actorRole: locals.user.role
+				}
+			});
+
 			return fail(403, { error: 'Access denied.' });
 		}
 
