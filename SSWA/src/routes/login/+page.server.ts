@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { login } from '$lib/server/auth/service';
-import { setSessionCookie } from '$lib/server/auth/session';
+import { setLastAccountUseNoticeCookie, setSessionCookie } from '$lib/server/auth/session';
 import { logValidationFailure } from '$lib/server/logging/security-log';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -42,6 +42,11 @@ export const actions: Actions = {
 		}
 
 		setSessionCookie(cookies, result.sessionToken);
+		setLastAccountUseNoticeCookie(cookies, {
+			previousSuccessfulLoginAt: result.lastAccountUse?.previousSuccessfulLoginAt?.toISOString() ?? null,
+			previousFailedLoginAt: result.lastAccountUse?.previousFailedLoginAt?.toISOString() ?? null
+		});
+
 		throw redirect(303, '/');
 	}
 };

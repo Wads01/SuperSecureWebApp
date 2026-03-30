@@ -1,6 +1,7 @@
 import { UserRole, UserStatus } from '../../../../generated/prisma/enums';
 import { prisma } from '$lib/server/db';
 import { hashPassword, verifyPassword } from '$lib/server/auth/password';
+import { MIN_PASSWORD_AGE_MS } from '$lib/server/auth/password-policy';
 import {
 	SESSION_TTL_SECONDS,
 	generateSessionToken,
@@ -26,8 +27,24 @@ export type AuthUser = {
 };
 
 type AuthResult =
-	| { ok: true; user: AuthUser; sessionToken: string }
+	| {
+			ok: true;
+			user: AuthUser;
+			sessionToken: string;
+			lastAccountUse?: {
+				previousSuccessfulLoginAt: Date | null;
+				previousFailedLoginAt: Date | null;
+			};
+	  }
 	| { ok: false; message: string };
+
+type PasswordChangeResult =
+	| { ok: true; message: string }
+	| {
+			ok: false;
+			message: string;
+			validationError?: boolean;
+	  };
 
 function toAuthUser(user: {
 	id: string;
@@ -63,9 +80,122 @@ async function createSession(userId: string, context: SecurityContext): Promise<
 	return rawToken;
 }
 
+async function isPasswordReused(userId: string, proposedPassword: string): Promise<boolean> {
+	const historyEntries = await prisma.passwordHistory.findMany({
+		where: { userId },
+		orderBy: { createdAt: 'desc' },
+		take: 10,
+		select: {
+			passwordHash: true
+		}
+	});
+
+	for (const historyEntry of historyEntries) {
+		if (await verifyPassword(proposedPassword, historyEntry.passwordHash)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+async function updatePasswordWithPolicy(params: {
+	userId: string;
+	proposedPassword: string;
+	context: SecurityContext;
+	eventType: 'AUTH_PASSWORD_CHANGE' | 'AUTH_PASSWORD_RESET';
+	actorUserId?: string;
+}): Promise<PasswordChangeResult> {
+	const user = await prisma.user.findUnique({
+		where: { id: params.userId },
+		select: {
+			id: true,
+			passwordChangedAt: true
+		}
+	});
+
+	if (!user) {
+		return { ok: false, message: 'Unable to process password update.' };
+	}
+
+	const ageMs = Date.now() - user.passwordChangedAt.getTime();
+	if (ageMs < MIN_PASSWORD_AGE_MS) {
+		await writeSecurityLog({
+			actorUserId: params.actorUserId ?? user.id,
+			eventType: params.eventType,
+			outcome: 'DENIED',
+			route: params.context.route,
+			ip: params.context.ip,
+			userAgent: params.context.userAgent,
+			metadataJson: { reason: 'password_minimum_age_not_met' }
+		});
+
+		return {
+			ok: false,
+			message: 'Password must be at least one day old before it can be changed again.',
+			validationError: true
+		};
+	}
+
+	if (await isPasswordReused(user.id, params.proposedPassword)) {
+		await writeSecurityLog({
+			actorUserId: params.actorUserId ?? user.id,
+			eventType: params.eventType,
+			outcome: 'DENIED',
+			route: params.context.route,
+			ip: params.context.ip,
+			userAgent: params.context.userAgent,
+			metadataJson: { reason: 'password_reuse_detected' }
+		});
+
+		return {
+			ok: false,
+			message: 'Password re-use is not allowed.',
+			validationError: true
+		};
+	}
+
+	const nextPasswordHash = await hashPassword(params.proposedPassword);
+
+	await prisma.$transaction([
+		prisma.user.update({
+			where: { id: user.id },
+			data: {
+				passwordHash: nextPasswordHash,
+				passwordChangedAt: new Date()
+			}
+		}),
+		prisma.passwordHistory.create({
+			data: {
+				userId: user.id,
+				passwordHash: nextPasswordHash
+			}
+		})
+	]);
+
+	await writeSecurityLog({
+		actorUserId: params.actorUserId ?? user.id,
+		eventType: params.eventType,
+		outcome: 'SUCCESS',
+		route: params.context.route,
+		ip: params.context.ip,
+		userAgent: params.context.userAgent
+	});
+
+	return {
+		ok: true,
+		message:
+			params.eventType === 'AUTH_PASSWORD_CHANGE'
+				? 'Password changed successfully.'
+				: 'Password reset successfully.'
+	};
+}
+
 export async function registerRoleB(
 	email: string,
 	password: string,
+	resetQuestion: string,
+	resetAnswer: string,
 	context: SecurityContext
 ): Promise<AuthResult> {
 	const normalizedEmail = email.trim().toLowerCase();
@@ -82,6 +212,7 @@ export async function registerRoleB(
 	}
 
 	const passwordHash = await hashPassword(password);
+	const resetAnswerHash = await hashPassword(resetAnswer);
 
 	const user = await prisma.user.create({
 		data: {
@@ -89,6 +220,8 @@ export async function registerRoleB(
 			role: UserRole.USER,
 			status: UserStatus.ACTIVE,
 			passwordHash,
+			resetQuestion: resetQuestion.trim(),
+			resetAnswerHash,
 			passwordHistory: {
 				create: {
 					passwordHash
@@ -136,7 +269,9 @@ export async function login(
 			scopeId: true,
 			passwordHash: true,
 			failedLoginCount: true,
-			lockoutUntil: true
+			lockoutUntil: true,
+			lastLoginSuccessAt: true,
+			lastLoginFailureAt: true
 		}
 	});
 
@@ -214,6 +349,9 @@ export async function login(
 		return { ok: false, message: genericFailureMessage };
 	}
 
+	const previousSuccessfulLoginAt = user.lastLoginSuccessAt;
+	const previousFailedLoginAt = user.lastLoginFailureAt;
+
 	await prisma.user.update({
 		where: { id: user.id },
 		data: {
@@ -239,8 +377,121 @@ export async function login(
 	return {
 		ok: true,
 		user: toAuthUser(user),
-		sessionToken
+		sessionToken,
+		lastAccountUse: {
+			previousSuccessfulLoginAt,
+			previousFailedLoginAt
+		}
 	};
+}
+
+export async function changePasswordWithReauth(
+	userId: string,
+	currentPassword: string,
+	newPassword: string,
+	context: SecurityContext
+): Promise<PasswordChangeResult> {
+	const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: {
+			id: true,
+			passwordHash: true
+		}
+	});
+
+	if (!user) {
+		return { ok: false, message: 'Unable to process password change.' };
+	}
+
+	const verified = await verifyPassword(currentPassword, user.passwordHash);
+	if (!verified) {
+		await writeSecurityLog({
+			actorUserId: user.id,
+			eventType: 'AUTH_REAUTH',
+			outcome: 'FAILURE',
+			route: context.route,
+			ip: context.ip,
+			userAgent: context.userAgent,
+			metadataJson: { reason: 'current_password_mismatch' }
+		});
+
+		return { ok: false, message: 'Current password is incorrect.', validationError: true };
+	}
+
+	await writeSecurityLog({
+		actorUserId: user.id,
+		eventType: 'AUTH_REAUTH',
+		outcome: 'SUCCESS',
+		route: context.route,
+		ip: context.ip,
+		userAgent: context.userAgent
+	});
+
+	return updatePasswordWithPolicy({
+		userId: user.id,
+		proposedPassword: newPassword,
+		context,
+		eventType: 'AUTH_PASSWORD_CHANGE',
+		actorUserId: user.id
+	});
+}
+
+export async function resetPasswordWithSecurityChallenge(
+	email: string,
+	question: string,
+	answer: string,
+	newPassword: string,
+	context: SecurityContext
+): Promise<PasswordChangeResult> {
+	const normalizedEmail = email.trim().toLowerCase();
+	const genericFailure = 'Unable to reset password with the provided details.';
+
+	const user = await prisma.user.findUnique({
+		where: { email: normalizedEmail },
+		select: {
+			id: true,
+			resetQuestion: true,
+			resetAnswerHash: true
+		}
+	});
+
+	if (!user || !user.resetQuestion || !user.resetAnswerHash) {
+		await writeSecurityLog({
+			eventType: 'AUTH_PASSWORD_RESET',
+			outcome: 'FAILURE',
+			route: context.route,
+			ip: context.ip,
+			userAgent: context.userAgent,
+			metadataJson: { reason: 'user_or_reset_challenge_not_found' }
+		});
+
+		return { ok: false, message: genericFailure };
+	}
+
+	const questionMatches = user.resetQuestion.trim().toLowerCase() === question.trim().toLowerCase();
+	const answerMatches = await verifyPassword(answer, user.resetAnswerHash);
+
+	if (!questionMatches || !answerMatches) {
+		await writeSecurityLog({
+			actorUserId: user.id,
+			eventType: 'AUTH_PASSWORD_RESET',
+			outcome: 'FAILURE',
+			route: context.route,
+			ip: context.ip,
+			userAgent: context.userAgent,
+			metadataJson: { reason: 'challenge_verification_failed' }
+		});
+
+		return { ok: false, message: genericFailure, validationError: true };
+	}
+
+	return updatePasswordWithPolicy({
+		userId: user.id,
+		proposedPassword: newPassword,
+		context,
+		eventType: 'AUTH_PASSWORD_RESET',
+		actorUserId: user.id
+	});
 }
 
 export async function getSessionFromToken(token: string) {

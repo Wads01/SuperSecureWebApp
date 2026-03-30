@@ -62,6 +62,8 @@ model User {
   role               UserRole
   status             UserStatus @default(ACTIVE)
   passwordHash       String
+  resetQuestion      String?    @db.VarChar(200)
+  resetAnswerHash    String?
   failedLoginCount   Int        @default(0)
   lockoutUntil       DateTime?
   passwordChangedAt  DateTime   @default(now())

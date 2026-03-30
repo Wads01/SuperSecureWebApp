@@ -20,6 +20,10 @@ declare global {
 		}
 		interface PageData {
 			user?: App.Locals['user'];
+			lastAccountUse?: {
+				previousSuccessfulLoginAt: string | null;
+				previousFailedLoginAt: string | null;
+			} | null;
 		}
 		// interface PageState {}
 		// interface Platform {}

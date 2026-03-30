@@ -1,56 +1,49 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { registerRoleB } from '$lib/server/auth/service';
-import { setSessionCookie } from '$lib/server/auth/session';
+import { resetPasswordWithSecurityChallenge } from '$lib/server/auth/service';
 import { validatePasswordComplexity, validateResetChallenge } from '$lib/server/auth/password-policy';
 import { logValidationFailure } from '$lib/server/logging/security-log';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user) {
-		throw redirect(303, '/');
-	}
-
+export const load: PageServerLoad = async () => {
 	return {};
 };
 
 export const actions: Actions = {
-	default: async ({ request, getClientAddress, cookies, url, locals }) => {
+	default: async ({ request, getClientAddress, url, locals }) => {
 		const formData = await request.formData();
 		const email = String(formData.get('email') ?? '').trim();
-		const password = String(formData.get('password') ?? '');
-		const confirmPassword = String(formData.get('confirmPassword') ?? '');
 		const resetQuestion = String(formData.get('resetQuestion') ?? '').trim();
 		const resetAnswer = String(formData.get('resetAnswer') ?? '');
+		const newPassword = String(formData.get('newPassword') ?? '');
+		const confirmPassword = String(formData.get('confirmPassword') ?? '');
 
-		if (!email || !password || !confirmPassword || !resetQuestion || !resetAnswer) {
+		if (!email || !resetQuestion || !resetAnswer || !newPassword || !confirmPassword) {
 			await logValidationFailure({
 				actorUserId: locals.user?.id,
 				route: url.pathname,
 				ip: getClientAddress(),
 				userAgent: request.headers.get('user-agent'),
 				reason: 'missing_required_fields',
-				fields: ['email', 'password', 'confirmPassword', 'resetQuestion', 'resetAnswer']
+				fields: ['email', 'resetQuestion', 'resetAnswer', 'newPassword', 'confirmPassword']
 			});
 
-			return fail(400, {
-				error: 'Email, password, and reset challenge fields are required.'
-			});
+			return fail(400, { error: 'All fields are required.' });
 		}
 
-		if (password !== confirmPassword) {
+		if (newPassword !== confirmPassword) {
 			await logValidationFailure({
 				actorUserId: locals.user?.id,
 				route: url.pathname,
 				ip: getClientAddress(),
 				userAgent: request.headers.get('user-agent'),
 				reason: 'password_confirmation_mismatch',
-				fields: ['password', 'confirmPassword']
+				fields: ['newPassword', 'confirmPassword']
 			});
 
 			return fail(400, { error: 'Passwords do not match.' });
 		}
 
-		const passwordPolicyError = validatePasswordComplexity(password);
+		const passwordPolicyError = validatePasswordComplexity(newPassword);
 		if (passwordPolicyError) {
 			await logValidationFailure({
 				actorUserId: locals.user?.id,
@@ -58,7 +51,7 @@ export const actions: Actions = {
 				ip: getClientAddress(),
 				userAgent: request.headers.get('user-agent'),
 				reason: 'password_policy_violation',
-				fields: ['password']
+				fields: ['newPassword']
 			});
 
 			return fail(400, { error: passwordPolicyError });
@@ -78,17 +71,22 @@ export const actions: Actions = {
 			return fail(400, { error: resetChallengeError });
 		}
 
-		const result = await registerRoleB(email, password, resetQuestion, resetAnswer, {
-			ip: getClientAddress(),
-			userAgent: request.headers.get('user-agent'),
-			route: url.pathname
-		});
+		const result = await resetPasswordWithSecurityChallenge(
+			email,
+			resetQuestion,
+			resetAnswer,
+			newPassword,
+			{
+				ip: getClientAddress(),
+				userAgent: request.headers.get('user-agent'),
+				route: url.pathname
+			}
+		);
 
 		if (!result.ok) {
-			return fail(400, { error: result.message });
+			return fail(result.validationError ? 400 : 403, { error: result.message });
 		}
 
-		setSessionCookie(cookies, result.sessionToken);
-		throw redirect(303, '/');
+		return { success: result.message };
 	}
 };

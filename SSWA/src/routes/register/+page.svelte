@@ -43,6 +43,28 @@
 			/>
 		</label>
 
+		<label class="flex flex-col gap-1">
+			<span class="text-sm font-medium">Security reset question</span>
+			<input
+				name="resetQuestion"
+				type="text"
+				placeholder="Example: What was your first internship company code?"
+				required
+				class="rounded border px-3 py-2"
+			/>
+		</label>
+
+		<label class="flex flex-col gap-1">
+			<span class="text-sm font-medium">Security reset answer</span>
+			<input
+				name="resetAnswer"
+				type="password"
+				autocomplete="off"
+				required
+				class="rounded border px-3 py-2"
+			/>
+		</label>
+
 		<button type="submit" class="rounded bg-black px-3 py-2 text-white">Register</button>
 	</form>
 
