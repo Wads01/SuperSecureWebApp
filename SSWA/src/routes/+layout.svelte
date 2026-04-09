@@ -1,9 +1,16 @@
 <script lang="ts">
-	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+  import './layout.css';
+  import { onMount } from 'svelte';
+  import { loadAuthFromStorage } from '$lib/context/auth';
+  import favicon from '$lib/assets/favicon.svg';
 
-	let { children } = $props();
+  onMount(() => {
+    loadAuthFromStorage();
+  });
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
-{@render children()}
+<svelte:head>
+  <link rel="icon" href={favicon} />
+</svelte:head>
+
+<slot />
