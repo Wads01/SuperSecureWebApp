@@ -2,8 +2,8 @@
   let { label = '', type = 'text', value = '', placeholder = '', error = '', name = '', autocomplete = 'off' } = $props();
 </script>
 
-<div class="space-y-2">
-  <label class="block text-sm font-medium text-slate-300" for={name}>{label}</label>
+<div class="space-y-1.5">
+  <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500" for={name}>{label}</label>
   <input
     id={name}
     name={name}
@@ -11,9 +11,9 @@
     bind:value
     placeholder={placeholder}
     autocomplete={autocomplete}
-    class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+    class="w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600"
   />
   {#if error}
-    <p class="text-xs text-rose-400">{error}</p>
+    <p class="text-xs text-red-400">{error}</p>
   {/if}
 </div>

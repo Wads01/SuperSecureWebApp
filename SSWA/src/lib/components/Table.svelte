@@ -2,16 +2,16 @@
   let { columns = [], items = [] } = $props();
 </script>
 
-<div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-xl">
-  <table class="min-w-full border-collapse text-left text-sm text-slate-300">
-    <thead class="bg-slate-900/90 text-slate-400">
+<div class="overflow-hidden rounded-lg border border-zinc-900">
+  <table class="min-w-full border-collapse text-left text-sm">
+    <thead class="border-b border-zinc-900 bg-zinc-950">
       <tr>
         {#each columns as column}
-          <th class="px-4 py-3 font-medium uppercase tracking-wide">{column}</th>
+          <th class="px-4 py-3 text-xs font-medium uppercase tracking-widest text-zinc-600">{column}</th>
         {/each}
       </tr>
     </thead>
-    <tbody class="divide-y divide-slate-800">
+    <tbody class="divide-y divide-zinc-900">
       <slot name="rows" {items} />
     </tbody>
   </table>
