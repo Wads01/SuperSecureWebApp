@@ -75,3 +75,17 @@ export function canAssignRole(actor: CurrentUser, targetRole: UserRole): boolean
 
 	return roleRank(targetRole) >= 2;
 }
+
+export function assertRole(user: App.Locals['user'], allowedRoles: UserRole[]): asserts user is CurrentUser {
+	if (!user || !allowedRoles.includes(user.role)) {
+		throw error(403, 'Access denied.');
+	}
+}
+
+export function assertAdmin(user: App.Locals['user']): asserts user is CurrentUser {
+	assertRole(user, [UserRole.ADMIN]);
+}
+
+export function assertManagerOrAdmin(user: App.Locals['user']): asserts user is CurrentUser {
+	assertRole(user, [UserRole.ADMIN, UserRole.MANAGER]);
+}
