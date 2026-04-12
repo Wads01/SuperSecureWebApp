@@ -19,7 +19,7 @@ const DASHBOARD_LINKS: RoleAwareNavLink[] = [
 	},
 	{
 		href: '/manager/orders',
-		label: 'Manager Orders',
+		label: 'Manage Orders',
 		allowedRoles: ['ADMIN', 'MANAGER']
 	},
 	{

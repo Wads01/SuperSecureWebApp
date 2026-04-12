@@ -54,7 +54,15 @@ export function canManageUser(actor: CurrentUser, target: { role: UserRole; scop
 	}
 
 	if (actor.role === UserRole.MANAGER) {
-		return target.role === UserRole.USER && actor.scopeId !== null && actor.scopeId === target.scopeId;
+		if (target.role !== UserRole.USER) {
+			return false;
+		}
+
+		if (target.scopeId === null) {
+			return true;
+		}
+
+		return actor.scopeId !== null && actor.scopeId === target.scopeId;
 	}
 
 	return false;

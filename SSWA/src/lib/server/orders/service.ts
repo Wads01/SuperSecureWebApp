@@ -251,7 +251,12 @@ export async function updateOwnOrder(params: {
 }
 
 export async function getManagerOrders(params: { user: CurrentUser; page: number; pageSize: number }) {
-	const where = params.user.role === UserRole.ADMIN ? {} : { scopeId: params.user.scopeId };
+	const where =
+		params.user.role === UserRole.ADMIN
+			? {}
+			: {
+				OR: [{ scopeId: params.user.scopeId }, { scopeId: null }]
+			};
 
 	const [totalCount, orders] = await Promise.all([
 		prisma.order.count({ where }),
@@ -303,7 +308,11 @@ export async function updateManagerOrderStatus(params: {
 		return { ok: false as const, status: 404, message: 'Order not found.' };
 	}
 
-	if (params.user.role === UserRole.MANAGER && params.user.scopeId !== order.scopeId) {
+	if (
+		params.user.role === UserRole.MANAGER &&
+		order.scopeId !== null &&
+		params.user.scopeId !== order.scopeId
+	) {
 		return { ok: false as const, status: 403, message: 'Order is outside your assigned scope.' };
 	}
 

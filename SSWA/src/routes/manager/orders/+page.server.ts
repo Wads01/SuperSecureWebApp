@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const payload = (await response.json().catch(() => null)) as { error?: string } | null;
 
 		return {
-			error: payload?.error ?? 'Unable to load manager orders.',
+			error: payload?.error ?? 'Unable to load manage orders.',
 			totalCount: 0,
 			page,
 			pageSize,

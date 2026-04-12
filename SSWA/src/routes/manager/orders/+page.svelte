@@ -11,7 +11,7 @@
 </script>
 
 <main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 p-6">
-	<h1 class="text-2xl font-semibold">Manager Orders Dashboard</h1>
+	<h1 class="text-2xl font-semibold">Manage Orders Dashboard</h1>
 
 	<p class="text-sm text-gray-600">Use this page to test manager/admin order reads and status transitions.</p>
 
