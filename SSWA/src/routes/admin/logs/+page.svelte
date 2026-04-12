@@ -2,83 +2,112 @@
 	let { data } = $props();
 </script>
 
-<main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 p-6">
-	<h1 class="text-2xl font-semibold">Security Logs (Admin Only)</h1>
+<div class="min-h-screen bg-van-100 p-4">
+	<div class="mx-auto max-w-6xl grid gap-3">
 
-	<form method="GET" class="grid gap-3 rounded border p-4 md:grid-cols-2">
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Search</span>
-			<input
-				name="q"
-				value={data.filters.q}
-				placeholder="Route, IP, resource type or resource ID"
-				class="rounded border px-3 py-2"
-			/>
-		</label>
-
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Event Type</span>
-			<select name="eventType" class="rounded border px-3 py-2">
-				<option value="">All</option>
-				{#each data.options.eventTypes as eventType}
-					<option value={eventType} selected={data.filters.eventType === eventType}>{eventType}</option>
-				{/each}
-			</select>
-		</label>
-
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Outcome</span>
-			<select name="outcome" class="rounded border px-3 py-2">
-				<option value="">All</option>
-				{#each data.options.outcomes as outcome}
-					<option value={outcome} selected={data.filters.outcome === outcome}>{outcome}</option>
-				{/each}
-			</select>
-		</label>
-
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Route Contains</span>
-			<input name="route" value={data.filters.route} class="rounded border px-3 py-2" />
-		</label>
-
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">IP Contains</span>
-			<input name="ip" value={data.filters.ip} class="rounded border px-3 py-2" />
-		</label>
-
-		<div class="flex items-end gap-2">
-			<button type="submit" class="rounded bg-black px-3 py-2 text-white">Apply Filters</button>
-			<a href="/admin/logs" class="rounded border px-3 py-2">Reset</a>
+		<!-- Header tile -->
+		<div class="rounded-2xl bg-choc-800 p-5 flex items-center justify-between text-van-100">
+			<div>
+				<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Admin</p>
+				<h1 class="mt-0.5 text-2xl font-bold">Security Logs</h1>
+			</div>
+			<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
+				← Dashboard
+			</a>
 		</div>
-	</form>
 
-	<div class="overflow-x-auto rounded border">
-		<table class="min-w-full text-sm">
-			<thead class="bg-gray-100 text-left">
-				<tr>
-					<th class="px-3 py-2">Time</th>
-					<th class="px-3 py-2">Event</th>
-					<th class="px-3 py-2">Outcome</th>
-					<th class="px-3 py-2">Route</th>
-					<th class="px-3 py-2">IP</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each data.logs as log}
-					<tr class="border-t">
-						<td class="px-3 py-2">{new Date(log.createdAt).toLocaleString()}</td>
-						<td class="px-3 py-2">{log.eventType}</td>
-						<td class="px-3 py-2">{log.outcome}</td>
-						<td class="px-3 py-2">{log.route ?? '-'}</td>
-						<td class="px-3 py-2">{log.ip ?? '-'}</td>
-					</tr>
-				{/each}
-				{#if data.logs.length === 0}
-					<tr class="border-t">
-						<td class="px-3 py-4 text-center text-gray-500" colspan="5">No logs matched your filters.</td>
-					</tr>
-				{/if}
-			</tbody>
-		</table>
+		<!-- Filter bento block -->
+		<div class="rounded-2xl bg-van-50 p-5">
+			<p class="mb-3 text-xs font-semibold uppercase tracking-widest text-choc-600">Filters</p>
+			<form method="GET" class="grid grid-cols-2 gap-3 md:grid-cols-3">
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Search</span>
+					<input name="q" value={data.filters.q} placeholder="Route, IP, resource…"
+						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-sm text-choc-800 outline-none focus:border-straw-500" />
+				</label>
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Event type</span>
+					<select name="eventType" class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-sm text-choc-800 outline-none focus:border-straw-500">
+						<option value="">All</option>
+						{#each data.options.eventTypes as eventType}
+							<option value={eventType} selected={data.filters.eventType === eventType}>{eventType}</option>
+						{/each}
+					</select>
+				</label>
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Outcome</span>
+					<select name="outcome" class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-sm text-choc-800 outline-none focus:border-straw-500">
+						<option value="">All</option>
+						{#each data.options.outcomes as outcome}
+							<option value={outcome} selected={data.filters.outcome === outcome}>{outcome}</option>
+						{/each}
+					</select>
+				</label>
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Route</span>
+					<input name="route" value={data.filters.route}
+						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-sm text-choc-800 outline-none focus:border-straw-500" />
+				</label>
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">IP</span>
+					<input name="ip" value={data.filters.ip}
+						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-sm text-choc-800 outline-none focus:border-straw-500" />
+				</label>
+				<div class="flex items-end gap-2">
+					<button type="submit" class="flex-1 rounded-xl bg-straw-500 px-3 py-2 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
+						Apply
+					</button>
+					<a href="/admin/logs" class="flex-1 rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-center text-sm font-semibold text-choc-600 hover:border-choc-600 transition-colors">
+						Reset
+					</a>
+				</div>
+			</form>
+		</div>
+
+		<!-- Logs table bento block -->
+		<div class="rounded-2xl bg-van-50 overflow-hidden">
+			<div class="p-4 pb-2">
+				<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">
+					{data.logs.length} {data.logs.length === 1 ? 'entry' : 'entries'}
+				</p>
+			</div>
+			<div class="overflow-x-auto px-4 pb-4">
+				<table class="min-w-full text-sm">
+					<thead>
+						<tr class="border-b-2 border-van-300">
+							<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Time</th>
+							<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Event</th>
+							<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Outcome</th>
+							<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Route</th>
+							<th class="pb-2 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">IP</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-van-200">
+						{#each data.logs as log}
+							<tr class="hover:bg-van-100 transition-colors">
+								<td class="py-2.5 pr-4 text-xs text-choc-600 whitespace-nowrap">{new Date(log.createdAt).toLocaleString()}</td>
+								<td class="py-2.5 pr-4 font-semibold text-choc-800">{log.eventType}</td>
+								<td class="py-2.5 pr-4">
+									<span class="rounded-lg px-2 py-0.5 text-xs font-bold
+										{log.outcome === 'SUCCESS' ? 'bg-van-300 text-choc-700' :
+										 log.outcome === 'FAILURE' ? 'bg-straw-100 text-straw-600' :
+										 'bg-choc-700 text-van-100'}">
+										{log.outcome}
+									</span>
+								</td>
+								<td class="py-2.5 pr-4 text-xs text-choc-600 font-mono">{log.route ?? '-'}</td>
+								<td class="py-2.5 text-xs text-choc-600 font-mono">{log.ip ?? '-'}</td>
+							</tr>
+						{/each}
+						{#if data.logs.length === 0}
+							<tr>
+								<td class="py-8 text-center text-sm text-choc-600" colspan="5">No logs matched your filters.</td>
+							</tr>
+						{/if}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
 	</div>
-</main>
+</div>
