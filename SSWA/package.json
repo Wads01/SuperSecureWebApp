@@ -13,6 +13,9 @@
 		"lint": "prettier --check .",
 		"format": "prettier --write ."
 	},
+	"prisma": {
+		"seed": "tsx prisma/seed.ts"
+	},
 	"devDependencies": {
 		"@prisma/client": "^7.6.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
@@ -31,6 +34,7 @@
 		"svelte": "^5.54.0",
 		"svelte-check": "^4.4.2",
 		"tailwindcss": "^4.1.18",
+		"tsx": "^4.20.3",
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1"
 	},
