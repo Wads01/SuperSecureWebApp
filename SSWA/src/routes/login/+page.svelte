@@ -3,11 +3,11 @@
   import { login } from '$lib/services/api';
   import { saveAuth } from '$lib/context/auth';
 
-  let email = $state('');
-  let password = $state('');
-  let showPassword = $state(false);
-  let error = $state('');
-  let loading = $state(false);
+  let email = '';
+  let password = '';
+  let showPassword = false;
+  let error = '';
+  let loading = false;
 
   async function handleSubmit(event: Event) {
     event.preventDefault();
@@ -23,10 +23,6 @@
     try {
       const response = await login(email, password);
       saveAuth(response.user);
-      // Auth (12): persist last-use info for display after redirect (shown once then cleared)
-      if (response.lastAccountUse) {
-        sessionStorage.setItem('sswa_last_use', JSON.stringify(response.lastAccountUse));
-      }
       const role = response.user.role;
       const route = role === 'admin' ? '/admin' : role === 'manager' ? '/manager' : '/dashboard';
       goto(route);
@@ -38,36 +34,37 @@
   }
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-black px-4">
-  <div class="w-full max-w-sm">
-    <div class="mb-8 text-center">
-      <p class="text-xs font-medium uppercase tracking-widest text-zinc-600">Secure sign in</p>
-      <h1 class="mt-2 text-xl font-medium text-white">Welcome back</h1>
+<div class="min-h-screen bg-slate-950 px-4 py-20">
+  <div class="mx-auto max-w-lg rounded-[2rem] border border-slate-800 bg-slate-950/95 p-10 shadow-2xl">
+    <div class="mb-8 space-y-2 text-center">
+      <p class="text-sm uppercase tracking-[0.35em] text-sky-400/80">Secure sign in</p>
+      <h1 class="text-3xl font-semibold text-slate-100">Login to your workspace</h1>
+      <p class="text-slate-400">Access your role-based dashboard with secure authentication.</p>
     </div>
 
     {#if error}
-      <div class="mb-5 border-l-2 border-red-500 bg-zinc-950 px-3 py-2.5 text-sm text-red-400">
+      <div class="mb-5 rounded-3xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
         {error}
       </div>
     {/if}
 
-    <form class="space-y-4" onsubmit={handleSubmit}>
-      <div class="space-y-1.5">
-        <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Email</label>
+    <form class="space-y-5" onsubmit={handleSubmit}>
+      <div class="space-y-4">
+        <label class="block text-sm font-medium text-slate-300">Email</label>
         <input
           type="email"
           bind:value={email}
           placeholder="you@example.com"
-          class="w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600"
+          class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
         />
       </div>
 
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Password</label>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between text-sm text-slate-400">
+          <label class="font-medium text-slate-300">Password</label>
           <button
             type="button"
-            class="text-xs text-zinc-600 transition hover:text-white"
+            class="text-sky-400 hover:text-sky-300"
             onclick={() => (showPassword = !showPassword)}
           >
             {showPassword ? 'Hide' : 'Show'}
@@ -76,30 +73,27 @@
         <input
           type={showPassword ? 'text' : 'password'}
           bind:value={password}
-          placeholder="Your password"
-          class="w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600"
+          placeholder="Enter your password"
+          class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
         />
       </div>
 
       <button
         type="submit"
-        class="relative w-full rounded px-4 py-2.5 text-sm font-medium transition
-          {loading ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-white text-black hover:bg-zinc-100'}"
+        class="w-full rounded-3xl bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={loading}
       >
         {#if loading}
-          <span class="flex items-center justify-center gap-2">
-            <span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-600 border-t-zinc-300"></span>
-            Signing in…
-          </span>
+          Signing in...
         {:else}
-          Sign in
+          Login
         {/if}
       </button>
     </form>
 
-    <p class="mt-6 text-center text-xs text-zinc-600">
-      No account? <a href="/register" class="text-zinc-400 transition hover:text-white">Create one</a>
-    </p>
+    <div class="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
+      <span>New here?</span>
+      <a href="/register" class="font-semibold text-slate-100 hover:text-sky-300">Create an account</a>
+    </div>
   </div>
 </div>

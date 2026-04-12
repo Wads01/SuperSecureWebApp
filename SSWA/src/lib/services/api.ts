@@ -52,20 +52,13 @@ export interface UserPayload {
 export interface LogPayload {
   id: string;
   level: 'info' | 'warning' | 'error';
-  eventType: string;
   message: string;
   user: string;
-  ip?: string;
   createdAt: string;
 }
 
-export interface LastAccountUse {
-  previousSuccessfulLoginAt: string | null;
-  previousFailedLoginAt: string | null;
-}
-
 export async function login(email: string, password: string) {
-  return apiFetch<{ user: AuthUser; lastAccountUse: LastAccountUse }>('/api/auth/login', {
+  return apiFetch<{ user: AuthUser }>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
@@ -136,11 +129,4 @@ export async function assignTask(id: string, task: string) {
 export async function fetchLogs(filter = '') {
   const query = filter ? `?filter=${encodeURIComponent(filter)}` : '';
   return apiFetch<LogPayload[]>(`/api/logs${query}`);
-}
-
-export async function changePassword(currentPassword: string, newPassword: string, confirmPassword: string) {
-  return apiFetch<{ message: string }>('/api/auth/change-password', {
-    method: 'POST',
-    body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
-  });
 }

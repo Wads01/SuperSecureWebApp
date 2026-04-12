@@ -3,14 +3,14 @@
 </script>
 
 {#if open}
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-    <div class="w-full max-w-lg rounded-lg border border-zinc-800 bg-black p-6">
-      <div class="mb-5 flex items-center justify-between">
-        <h2 class="text-sm font-medium text-white">{title}</h2>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-2xl">
+      <div class="mb-5 flex items-center justify-between gap-4">
+        <h2 class="text-xl font-semibold text-slate-100">{title}</h2>
         <button
           type="button"
           on:click={onClose}
-          class="text-sm text-zinc-600 transition hover:text-white"
+          class="rounded-full border border-slate-700 bg-slate-900 px-3 py-2 text-slate-200 transition hover:bg-slate-800"
         >
           Close
         </button>

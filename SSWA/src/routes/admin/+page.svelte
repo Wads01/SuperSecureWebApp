@@ -6,16 +6,16 @@
   import Table from '$lib/components/Table.svelte';
   import { createUser, deleteUser, fetchLogs, fetchUsers, updateUserRole, type LogPayload, type UserPayload } from '$lib/services/api';
 
-  let users: UserPayload[] = $state([]);
-  let logs: LogPayload[] = $state([]);
-  let loadingUsers = $state(true);
-  let loadingLogs = $state(true);
-  let error = $state('');
-  let userName = $state('');
-  let userEmail = $state('');
-  let userPassword = $state('');
-  let userRole: 'admin' | 'manager' | 'user' = $state('manager');
-  let logFilter = $state('');
+  let users: UserPayload[] = [];
+  let logs: LogPayload[] = [];
+  let loadingUsers = true;
+  let loadingLogs = true;
+  let error = '';
+  let userName = '';
+  let userEmail = '';
+  let userPassword = '';
+  let userRole: 'admin' | 'manager' | 'user' = 'manager';
+  let logFilter = '';
 
   async function loadUsers() {
     loadingUsers = true;
@@ -84,154 +84,163 @@
 </script>
 
 <ProtectedRoute requiredRoles={['admin']}>
-  <div class="flex min-h-screen bg-black">
-    <Sidebar />
-    <div class="min-w-0 flex-1">
-      <Navbar />
-      <div class="mx-auto max-w-6xl space-y-8 px-6 py-8">
-        <div>
-          <p class="text-xs font-medium uppercase tracking-widest text-zinc-600">Admin</p>
-          <h1 class="mt-1 text-lg font-medium text-white">Control panel</h1>
-        </div>
+  <div class="min-h-screen bg-slate-950 px-4 py-10">
+    <div class="mx-auto grid max-w-[1300px] gap-8 xl:grid-cols-[280px_1fr]">
+      <Sidebar />
+      <div class="space-y-8">
+        <Navbar />
 
-        {#if error}
-          <div class="border-l-2 border-red-500 bg-zinc-950 px-3 py-2.5 text-sm text-red-400">{error}</div>
-        {/if}
-
-        <div class="grid gap-6 xl:grid-cols-2">
-          <div class="space-y-4 rounded-lg border border-zinc-900 bg-zinc-950 p-6">
+        <section class="rounded-[2rem] border border-slate-800 bg-slate-950/95 p-8 shadow-2xl">
+          <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 class="text-sm font-medium text-white">Create user</h2>
-              <p class="mt-0.5 text-xs text-zinc-600">Add a new account to the system.</p>
+              <p class="text-sm uppercase tracking-[0.3em] text-sky-400/80">Admin dashboard</p>
+              <h1 class="mt-3 text-3xl font-semibold text-slate-100">Manage users and system logs</h1>
+              <p class="max-w-2xl text-slate-400">Create accounts, assign roles, and review audit activity in one secure panel.</p>
             </div>
-            <form class="space-y-3" onsubmit={handleCreateUser}>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Name</label>
-                <input type="text" bind:value={userName} placeholder="Jane Doe"
-                  class="w-full rounded border border-zinc-800 bg-black px-3 py-2 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600" />
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Email</label>
-                <input type="email" bind:value={userEmail} placeholder="jane@example.com"
-                  class="w-full rounded border border-zinc-800 bg-black px-3 py-2 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600" />
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Password</label>
-                <input type="password" bind:value={userPassword} placeholder="Strong password"
-                  class="w-full rounded border border-zinc-800 bg-black px-3 py-2 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600" />
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Role</label>
-                <select bind:value={userRole}
-                  class="w-full rounded border border-zinc-800 bg-black px-3 py-2 text-sm text-white outline-none transition focus:border-zinc-600">
-                  <option value="admin">Admin</option>
-                  <option value="manager">Manager</option>
-                  <option value="user">User</option>
-                </select>
-              </div>
-              <button type="submit"
-                class="rounded bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-100">
-                Create
-              </button>
-            </form>
           </div>
 
-          <div class="space-y-4 rounded-lg border border-zinc-900 bg-zinc-950 p-6">
-            <div>
-              <h2 class="text-sm font-medium text-white">System logs</h2>
-              <p class="mt-0.5 text-xs text-zinc-600">Audit activity and security events.</p>
-            </div>
-            <div class="flex gap-2">
-              <input type="text" bind:value={logFilter} placeholder="Filter by keyword"
-                class="flex-1 rounded border border-zinc-800 bg-black px-3 py-2 text-sm text-white placeholder-zinc-700 outline-none transition focus:border-zinc-600" />
-              <button type="button" onclick={loadLogs}
-                class="rounded border border-zinc-800 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white">
-                Filter
-              </button>
-            </div>
-            {#if loadingLogs}
-              <p class="text-xs text-zinc-600">Loading…</p>
-            {:else if logs.length === 0}
-              <p class="text-xs text-zinc-600">No logs match this filter.</p>
-            {:else}
-              <div class="overflow-hidden rounded border border-zinc-900">
-                <table class="min-w-full text-left text-xs">
-                  <thead class="border-b border-zinc-900 bg-black">
-                    <tr>
-                      <th class="px-3 py-2 font-medium uppercase tracking-widest text-zinc-600">When</th>
-                      <th class="px-3 py-2 font-medium uppercase tracking-widest text-zinc-600">User</th>
-                      <th class="px-3 py-2 font-medium uppercase tracking-widest text-zinc-600">Level</th>
-                      <th class="px-3 py-2 font-medium uppercase tracking-widest text-zinc-600">Message</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-zinc-900">
-                    {#each logs as log}
-                      <tr class="hover:bg-black">
-                        <td class="px-3 py-2 text-zinc-600">{new Date(log.createdAt).toLocaleString()}</td>
-                        <td class="px-3 py-2 text-zinc-400">{log.user}</td>
-                        <td class="px-3 py-2 uppercase {log.level === 'error' ? 'text-red-400' : log.level === 'warning' ? 'text-yellow-500' : 'text-zinc-500'}">{log.level}</td>
-                        <td class="px-3 py-2 text-zinc-500">{log.message}</td>
-                      </tr>
-                    {/each}
-                  </tbody>
-                </table>
-              </div>
-            {/if}
-          </div>
-        </div>
+          {#if error}
+            <div class="mb-6 rounded-3xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div>
+          {/if}
 
-        <div class="space-y-4 rounded-lg border border-zinc-900 bg-zinc-950 p-6">
-          <div>
-            <h2 class="text-sm font-medium text-white">Users</h2>
-            <p class="mt-0.5 text-xs text-zinc-600">Manage roles and accounts.</p>
-          </div>
-          {#if loadingUsers}
-            <p class="text-xs text-zinc-600">Loading…</p>
-          {:else if users.length === 0}
-            <p class="text-xs text-zinc-600">No users found.</p>
-          {:else}
-            <div class="overflow-hidden rounded border border-zinc-900">
-              <table class="min-w-full text-left text-sm">
-                <thead class="border-b border-zinc-900 bg-black">
-                  <tr>
-                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-widest text-zinc-600">Name</th>
-                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-widest text-zinc-600">Email</th>
-                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-widest text-zinc-600">Role</th>
-                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-widest text-zinc-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-900">
-                  {#each users as user}
-                    <tr class="hover:bg-black">
-                      <td class="px-4 py-3 text-white">{user.name}</td>
-                      <td class="px-4 py-3 text-zinc-400">{user.email}</td>
-                      <td class="px-4 py-3">
+          <div class="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
+            <div class="space-y-8">
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6">
+                <div class="mb-5">
+                  <h2 class="text-xl font-semibold text-slate-100">Create a new user</h2>
+                  <p class="text-sm text-slate-400">Add administrators, managers, or role B users.</p>
+                </div>
+                <form class="space-y-4" onsubmit={handleCreateUser}>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-300">Name</label>
+                    <input
+                      type="text"
+                      bind:value={userName}
+                      placeholder="Jane Doe"
+                      class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-300">Email</label>
+                    <input
+                      type="email"
+                      bind:value={userEmail}
+                      placeholder="jane@example.com"
+                      class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-300">Password</label>
+                    <input
+                      type="password"
+                      bind:value={userPassword}
+                      placeholder="Strong password"
+                      class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-300">Role</label>
+                    <select
+                      bind:value={userRole}
+                      class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="manager">Manager</option>
+                      <option value="user">Role B User</option>
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    class="rounded-3xl bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+                  >
+                    Create user
+                  </button>
+                </form>
+              </div>
+
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6">
+                <div class="mb-5 flex items-center justify-between">
+                  <div>
+                    <h2 class="text-xl font-semibold text-slate-100">Users</h2>
+                    <p class="text-sm text-slate-400">Update roles or delete accounts.</p>
+                  </div>
+                </div>
+                {#if loadingUsers}
+                  <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-8 text-center text-slate-400">Loading users…</div>
+                {:else if users.length === 0}
+                  <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-8 text-center text-slate-400">No user accounts found.</div>
+                {:else}
+                  <Table columns={['Name', 'Email', 'Role', 'Actions']} items={users}>
+                    <tr slot="rows" let:item class="hover:bg-slate-900/80">
+                      <td class="px-4 py-4 text-slate-100">{item.name}</td>
+                      <td class="px-4 py-4 text-slate-300">{item.email}</td>
+                      <td class="px-4 py-4 text-slate-300">
                         <select
-                          class="rounded border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-white outline-none"
-                          bind:value={user.role}
-                          onchange={(event) => handleRoleChange(user.id, (event.target as HTMLSelectElement).value as 'admin' | 'manager' | 'user')}
+                          class="rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none"
+                          bind:value={item.role}
+                          onchange={(event) => handleRoleChange(item.id, (event.target as HTMLSelectElement).value as 'admin' | 'manager' | 'user')}
                         >
                           <option value="admin">Admin</option>
                           <option value="manager">Manager</option>
-                          <option value="user">User</option>
+                          <option value="user">Role B</option>
                         </select>
                       </td>
-                      <td class="px-4 py-3">
+                      <td class="px-4 py-4">
                         <button
                           type="button"
-                          class="text-xs text-zinc-600 transition hover:text-red-400"
-                          onclick={() => handleDelete(user.id)}
+                          class="rounded-2xl border border-rose-600 bg-rose-600/10 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:bg-rose-600/20"
+                          onclick={() => handleDelete(item.id)}
                         >
                           Delete
                         </button>
                       </td>
                     </tr>
-                  {/each}
-                </tbody>
-              </table>
+                  </Table>
+                {/if}
+              </div>
             </div>
-          {/if}
-        </div>
+
+            <div class="space-y-8">
+              <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6">
+                <div class="mb-4 flex items-center justify-between gap-4">
+                  <div>
+                    <h2 class="text-xl font-semibold text-slate-100">System logs</h2>
+                    <p class="text-sm text-slate-400">Review audit activity and filter events.</p>
+                  </div>
+                </div>
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <input
+                    type="text"
+                    bind:value={logFilter}
+                    placeholder="Filter logs by keyword"
+                    class="w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 sm:w-auto"
+                  />
+                  <button
+                    type="button"
+                    class="rounded-3xl bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+                    onclick={loadLogs}
+                  >
+                    Filter
+                  </button>
+                </div>
+                {#if loadingLogs}
+                  <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-8 text-center text-slate-400">Loading logs…</div>
+                {:else if logs.length === 0}
+                  <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-8 text-center text-slate-400">No logs match this filter.</div>
+                {:else}
+                  <Table columns={['When', 'User', 'Level', 'Message']} items={logs}>
+                    <tr slot="rows" let:item class="hover:bg-slate-900/80">
+                      <td class="px-4 py-4 text-slate-300">{new Date(item.createdAt).toLocaleString()}</td>
+                      <td class="px-4 py-4 text-slate-100">{item.user}</td>
+                      <td class="px-4 py-4 text-slate-300 uppercase tracking-[0.1em]">{item.level}</td>
+                      <td class="px-4 py-4 text-slate-400">{item.message}</td>
+                    </tr>
+                  </Table>
+                {/if}
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>

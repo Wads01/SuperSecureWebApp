@@ -15,9 +15,10 @@
   });
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-black">
-  <div class="text-center">
-    <p class="text-xs font-medium uppercase tracking-widest text-zinc-600">SSWA</p>
-    <p class="mt-2 text-sm text-zinc-600">Redirecting…</p>
+<div class="flex min-h-screen items-center justify-center px-4 py-20">
+  <div class="max-w-xl rounded-[2rem] border border-slate-800 bg-slate-950/90 p-10 text-center shadow-2xl">
+    <p class="text-sm uppercase tracking-[0.3em] text-sky-400/80">Secure Web App</p>
+    <h1 class="mt-5 text-4xl font-semibold text-slate-100">Preparing your secure workspace…</h1>
+    <p class="mt-4 text-slate-400">If you are already signed in, you will be redirected automatically.</p>
   </div>
 </div>

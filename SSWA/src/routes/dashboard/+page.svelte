@@ -7,18 +7,14 @@
   import Table from '$lib/components/Table.svelte';
   import { createItem, deleteItem, fetchItems, updateItem, type ItemPayload } from '$lib/services/api';
 
-  let items: ItemPayload[] = $state([]);
-  let loading = $state(true);
-  let error = $state('');
-  let modalOpen = $state(false);
-  let saving = $state(false);
-  let activeItem: ItemPayload | null = $state(null);
-  let title = $state('');
-  let description = $state('');
-
-  // Auth (12): last-account-use notice shown once per session
-  interface LastUse { previousSuccessfulLoginAt: string | null; previousFailedLoginAt: string | null; }
-  let lastUse: LastUse | null = $state(null);
+  let items: ItemPayload[] = [];
+  let loading = true;
+  let error = '';
+  let modalOpen = false;
+  let saving = false;
+  let activeItem: ItemPayload | null = null;
+  let title = '';
+  let description = '';
 
   async function loadItems() {
     loading = true;
@@ -80,118 +76,110 @@
     }
   }
 
-  onMount(() => {
-    loadItems();
-    // Auth (12): read and clear the last-use notice stored by the login handler
-    const raw = sessionStorage.getItem('sswa_last_use');
-    if (raw) {
-      try { lastUse = JSON.parse(raw); } catch { /* ignore */ }
-      sessionStorage.removeItem('sswa_last_use');
-    }
-  });
+  onMount(loadItems);
 </script>
 
 <ProtectedRoute requiredRoles={['user']}>
-  <div class="min-h-screen bg-black">
-    <Navbar />
-    <div class="mx-auto max-w-5xl px-6 py-8">
-      <div class="mb-6 flex items-center justify-between">
-        <div>
-          <p class="text-xs font-medium uppercase tracking-widest text-zinc-600">Dashboard</p>
-          <h1 class="mt-1 text-lg font-medium text-white">Your workspace</h1>
+  <div class="min-h-screen bg-slate-950 px-4 py-10">
+    <div class="mx-auto flex max-w-[1200px] flex-col gap-8">
+      <Navbar />
+
+      <div class="rounded-[2rem] border border-slate-800 bg-slate-950/95 p-8 shadow-2xl">
+        <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="text-sm uppercase tracking-[0.3em] text-sky-400/80">Role B Dashboard</p>
+            <h1 class="mt-3 text-3xl font-semibold text-slate-100">Your secure workspace</h1>
+            <p class="max-w-2xl text-slate-400">Manage your own items and explore a clean dashboard designed for secure user data.</p>
+          </div>
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-3xl bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+            onclick={openCreate}
+          >
+            Add item
+          </button>
         </div>
-        <button
-          type="button"
-          class="rounded border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white"
-          onclick={openCreate}
-        >
-          New item
-        </button>
+
+        {#if error}
+          <div class="mb-6 rounded-3xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</div>
+        {/if}
+
+        {#if loading}
+          <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-10 text-center text-slate-400">Loading items…</div>
+        {:else}
+          {#if items.length === 0}
+            <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-10 text-center text-slate-400">
+              No items yet. Create your first record to get started.
+            </div>
+          {:else}
+            <div class="space-y-6">
+              <Table columns={['Title', 'Description', 'Owner', 'Created', 'Actions']} items={items}>
+                <tr slot="rows" let:item class="hover:bg-slate-900/80">
+                  <td class="px-4 py-4 text-slate-100">{item.title}</td>
+                  <td class="px-4 py-4 text-slate-400">{item.description}</td>
+                  <td class="px-4 py-4 text-slate-300">{item.ownerName}</td>
+                  <td class="px-4 py-4 text-slate-400">{new Date(item.createdAt).toLocaleDateString()}</td>
+                  <td class="px-4 py-4">
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-100 transition hover:border-sky-500"
+                        onclick={() => openEdit(item)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        class="rounded-2xl border border-rose-600 bg-rose-600/10 px-3 py-2 text-xs font-semibold text-rose-300 transition hover:bg-rose-600/20"
+                        onclick={() => removeItem(item.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </Table>
+            </div>
+          {/if}
+        {/if}
       </div>
-
-      {#if lastUse}
-        <div class="mb-5 border-l-2 border-zinc-700 bg-zinc-950 px-3 py-2.5 text-xs text-zinc-400">
-          <p class="font-medium uppercase tracking-widest text-zinc-500 mb-1">Last account activity</p>
-          <p>Last successful login: {lastUse.previousSuccessfulLoginAt ? new Date(lastUse.previousSuccessfulLoginAt).toLocaleString() : 'None recorded'}</p>
-          <p>Last failed login attempt: {lastUse.previousFailedLoginAt ? new Date(lastUse.previousFailedLoginAt).toLocaleString() : 'None recorded'}</p>
-        </div>
-      {/if}
-
-      {#if error}
-        <div class="mb-5 border-l-2 border-red-500 bg-zinc-950 px-3 py-2.5 text-sm text-red-400">{error}</div>
-      {/if}
-
-      {#if loading}
-        <p class="text-sm text-zinc-600">Loading…</p>
-      {:else if items.length === 0}
-        <div class="rounded-lg border border-zinc-900 bg-zinc-950 px-6 py-12 text-center">
-          <p class="text-sm text-zinc-600">No items yet. Create your first one.</p>
-        </div>
-      {:else}
-        <Table columns={['Title', 'Description', 'Owner', 'Created', 'Actions']} items={items}>
-          <tr slot="rows" let:item class="hover:bg-zinc-950">
-            <td class="px-4 py-3 text-sm text-white">{item.title}</td>
-            <td class="px-4 py-3 text-sm text-zinc-500">{item.description}</td>
-            <td class="px-4 py-3 text-sm text-zinc-400">{item.ownerName}</td>
-            <td class="px-4 py-3 text-sm text-zinc-600">{new Date(item.createdAt).toLocaleDateString()}</td>
-            <td class="px-4 py-3">
-              <div class="flex gap-3">
-                <button
-                  type="button"
-                  class="text-xs text-zinc-500 transition hover:text-white"
-                  onclick={() => openEdit(item)}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  class="text-xs text-zinc-600 transition hover:text-red-400"
-                  onclick={() => removeItem(item.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        </Table>
-      {/if}
     </div>
 
     <Modal open={modalOpen} title={activeItem ? 'Edit item' : 'New item'} onClose={() => (modalOpen = false)}>
-      <div class="space-y-4">
-        <div class="space-y-1.5">
-          <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Title</label>
+      <div class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Title</label>
           <input
             type="text"
             bind:value={title}
-            class="w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none transition focus:border-zinc-600"
+            class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
           />
         </div>
 
-        <div class="space-y-1.5">
-          <label class="block text-xs font-medium uppercase tracking-widest text-zinc-500">Description</label>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Description</label>
           <textarea
             bind:value={description}
-            rows={4}
-            class="w-full rounded border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-white outline-none transition focus:border-zinc-600"
+            rows={5}
+            class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
           />
         </div>
 
-        <div class="flex justify-end gap-4 pt-1">
+        <div class="flex justify-end gap-3 pt-2">
           <button
             type="button"
-            class="text-sm text-zinc-600 transition hover:text-white"
+            class="rounded-3xl border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-800"
             onclick={() => (modalOpen = false)}
           >
             Cancel
           </button>
           <button
             type="button"
-            class="rounded bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-100 disabled:opacity-50"
+            class="rounded-3xl bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
             onclick={saveItem}
             disabled={saving}
           >
-            {saving ? 'Saving…' : activeItem ? 'Save' : 'Create'}
+            {saving ? 'Saving…' : activeItem ? 'Save changes' : 'Create item'}
           </button>
         </div>
       </div>

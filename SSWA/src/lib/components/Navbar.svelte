@@ -11,22 +11,19 @@
   }
 </script>
 
-<nav class="flex items-center justify-between border-b border-zinc-900 bg-black px-6 py-4">
-  <span class="text-sm font-medium text-white">SSWA</span>
-  <div class="flex items-center gap-4">
+<nav class="flex items-center justify-between rounded-3xl border border-slate-800 bg-slate-950/95 px-5 py-4 shadow-2xl backdrop-blur-md">
+  <div>
+    <p class="text-sm uppercase tracking-[0.2em] text-sky-400/80">Secure Web App</p>
+    <p class="text-base text-slate-300">Modern access control dashboard</p>
+  </div>
+  <div class="flex items-center gap-3">
     {#if authUser}
-      <span class="text-sm text-zinc-500">{authUser.name} · {authUser.role}</span>
-      <a
-        href="/account/password"
-        class="rounded border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white"
-      >
-        Change password
-      </a>
+      <div class="rounded-2xl bg-slate-900 px-4 py-2 text-sm text-slate-200 shadow-inner">{authUser.name} · {authUser.role}</div>
     {/if}
     <button
       type="button"
       onclick={handleLogout}
-      class="rounded border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+      class="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-sky-500 hover:bg-slate-800"
     >
       Logout
     </button>
