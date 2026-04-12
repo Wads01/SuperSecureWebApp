@@ -45,3 +45,14 @@ export const managerUpdateOrderStatusSchema = z.object({
 export const adminAssignRoleSchema = z.object({
 	role: z.enum([UserRole.ADMIN, UserRole.MANAGER])
 });
+
+export const adminUpdateMenuPriceSchema = z.object({
+	pricePesos: z
+		.coerce
+		.number()
+		.min(1.0)
+		.max(500.0)
+		.refine((value) => Number(value.toFixed(2)) === value, {
+			message: 'pricePesos must have at most 2 decimal places.'
+		})
+});

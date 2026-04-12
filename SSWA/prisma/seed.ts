@@ -1,7 +1,17 @@
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client';
 import { MenuCategory } from '../generated/prisma/enums';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+
+if (!connectionString) {
+	throw new Error('DIRECT_URL or DATABASE_URL must be configured to run seed.');
+}
+
+const prisma = new PrismaClient({
+	adapter: new PrismaPg({ connectionString })
+});
 
 const menuItems = [
 	{ name: 'Espresso', category: MenuCategory.COFFEE, pricePesos: '120.00', sortOrder: 1 },

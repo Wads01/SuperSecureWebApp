@@ -387,6 +387,98 @@ if (password.length < MIN_PASSWORD_LENGTH) {
 
 ---
 
+### Data Validation (2) | Validate data range
+SSWA/src/lib/server/validation/order.ts
+```ts
+export const createOrderSchema = z.object({
+  notes: z.string().trim().max(300).optional(),
+  items: z
+    .array(
+      z.object({
+        menuItemId: z.string().uuid(),
+        quantity: z.number().int().min(1).max(20)
+      })
+    )
+    .min(1)
+    .max(20)
+});
+
+export const paginationQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).max(10000).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20)
+});
+
+export const adminUpdateMenuPriceSchema = z.object({
+  pricePesos: z
+    .coerce
+    .number()
+    .min(1.0)
+    .max(500.0)
+    .refine((value) => Number(value.toFixed(2)) === value, {
+      message: 'pricePesos must have at most 2 decimal places.'
+    })
+});
+```
+
+SSWA/src/routes/api/orders/+server.ts
+```ts
+const parsed = createOrderSchema.safeParse(payload);
+
+if (!parsed.success) {
+  await logValidationFailure({
+    actorUserId: locals.user.id,
+    route: url.pathname,
+    ip: getClientAddress(),
+    userAgent: request.headers.get('user-agent'),
+    reason: 'invalid_order_create_payload',
+    fields: parsed.error.issues.map((issue) => issue.path.join('.'))
+  });
+
+  return json({ error: 'Invalid order payload.' }, { status: 400 });
+}
+```
+
+SSWA/src/routes/api/manager/orders/+server.ts
+```ts
+const parsed = paginationQuerySchema.safeParse({
+  page: url.searchParams.get('page') ?? '1',
+  pageSize: url.searchParams.get('pageSize') ?? '20'
+});
+
+if (!parsed.success) {
+  await logValidationFailure({
+    actorUserId: locals.user.id,
+    route: url.pathname,
+    ip: getClientAddress(),
+    userAgent: request.headers.get('user-agent'),
+    reason: 'invalid_pagination_query',
+    fields: parsed.error.issues.map((issue) => issue.path.join('.'))
+  });
+
+  return json({ error: 'Invalid pagination query.' }, { status: 400 });
+}
+```
+
+SSWA/src/routes/api/admin/menu/[menuItemId]/price/+server.ts
+```ts
+const parsed = adminUpdateMenuPriceSchema.safeParse(payload);
+
+if (!parsed.success) {
+  await logValidationFailure({
+    actorUserId: locals.user.id,
+    route: url.pathname,
+    ip: getClientAddress(),
+    userAgent: request.headers.get('user-agent'),
+    reason: 'invalid_menu_price_payload',
+    fields: parsed.error.issues.map((issue) => issue.path.join('.'))
+  });
+
+  return json({ error: 'Invalid menu price payload.' }, { status: 400 });
+}
+```
+
+---
+
 ### Error Handling and Logging (2) | Generic error messages
 SSWA/src/lib/server/auth/service.ts
 ```ts
@@ -724,5 +816,5 @@ if (!canManageUser(locals.user, targetUser)) {
 
 ## Not Yet Implemented (Pending)
 
-- Data Validation (2)
+- None (all specified controls currently covered in checklist)
 
