@@ -18,13 +18,13 @@
 			</form>
 		</div>
 	</div>
-	<div class="px-8 py-4">
-		<div class="grid gap-3">
+	<div class="px-8 py-6 max-w-4xl mx-auto">
+		<div class="grid gap-6">
 
 		{#if data.user}
-			<!-- Account info + last-use: 2-col bento row -->
-			<div class="grid grid-cols-2 gap-3">
-				<div class="rounded-2xl bg-choc-600 p-5 text-van-100">
+			<!-- Account info + last activity -->
+			<div class="grid grid-cols-2 gap-4">
+				<div class="rounded-2xl bg-choc-800 p-5 text-van-100">
 					<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Account</p>
 					<p class="mt-2 text-sm font-medium truncate">{data.user.email}</p>
 					<div class="mt-3 flex flex-wrap gap-2">
@@ -32,8 +32,7 @@
 						<span class="rounded-lg bg-choc-700 px-2.5 py-1 text-xs font-bold">{data.user.status}</span>
 					</div>
 				</div>
-
-			<div class="rounded-2xl bg-straw-100 p-5">
+				<div class="rounded-2xl bg-straw-100 p-5">
 					<p class="text-xs font-semibold uppercase tracking-widest text-straw-600">Last activity</p>
 					{#if data.lastAccountUse}
 						<div class="mt-2 grid gap-2">
@@ -60,60 +59,107 @@
 				</div>
 			</div>
 
-			<!-- Navigation bento tiles -->
+			<!-- Role-specific navigation, grouped by section -->
 			{#if data.user.role === 'USER'}
-				<div class="grid grid-cols-3 gap-3">
-					<a href="/menu" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Cafe</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Menu / Order →</p>
-					</a>
-					<a href="/orders/me" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Cafe</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">My Orders →</p>
-					</a>
-					<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
+				<!-- Cafe section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Cafe</p>
+					<div class="grid grid-cols-2 gap-3">
+						<a href="/menu" class="rounded-2xl bg-choc-700 p-5 hover:bg-choc-600 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Order</p>
+							<p class="mt-1 text-base font-bold text-van-100 group-hover:text-van-50 transition-colors">Browse Menu →</p>
+							<p class="mt-1 text-xs text-van-300">View items and place a new order</p>
+						</a>
+						<a href="/orders/me" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">History</p>
+							<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">My Orders →</p>
+							<p class="mt-1 text-xs text-choc-600">View and cancel pending orders</p>
+						</a>
+					</div>
+				</div>
+				<!-- Account section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Account</p>
+					<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+						<div>
+							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
+							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
+						</div>
+						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
 					</a>
 				</div>
+
 			{:else if data.user.role === 'MANAGER'}
-				<div class="grid grid-cols-3 gap-3">
-					<a href="/manager/orders" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Orders →</p>
-					</a>
-					<a href="/manager/users" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Users →</p>
-					</a>
-					<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
+				<!-- Manage section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Manage</p>
+					<div class="grid grid-cols-2 gap-3">
+						<a href="/manager/orders" class="rounded-2xl bg-choc-700 p-5 hover:bg-choc-600 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Orders</p>
+							<p class="mt-1 text-base font-bold text-van-100 group-hover:text-van-50 transition-colors">All Orders →</p>
+							<p class="mt-1 text-xs text-van-300">View and update order statuses</p>
+						</a>
+						<a href="/manager/users" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Users</p>
+							<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">User Management →</p>
+							<p class="mt-1 text-xs text-choc-600">Enable or disable customer accounts</p>
+						</a>
+					</div>
+				</div>
+				<!-- Account section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Account</p>
+					<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+						<div>
+							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
+							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
+						</div>
+						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
 					</a>
 				</div>
+
 			{:else if data.user.role === 'ADMIN'}
-				<div class="grid grid-cols-3 gap-3">
-					<a href="/admin/users" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Admin</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Users →</p>
-					</a>
-					<a href="/admin/menu" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Admin</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Menu Pricing →</p>
-					</a>
-					<a href="/admin/logs" class="rounded-2xl bg-straw-500 p-5 hover:bg-straw-600 transition-colors">
-						<p class="text-xs font-semibold uppercase tracking-widest text-straw-100">Admin</p>
-						<p class="mt-1 text-base font-bold text-white">Security Logs →</p>
+				<!-- Admin Tools section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Admin Tools</p>
+					<div class="grid grid-cols-3 gap-3">
+						<a href="/admin/users" class="rounded-2xl bg-choc-700 p-5 hover:bg-choc-600 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Users</p>
+							<p class="mt-1 text-base font-bold text-van-100 group-hover:text-van-50 transition-colors">User Management →</p>
+							<p class="mt-1 text-xs text-van-300">Assign roles and set statuses</p>
+						</a>
+						<a href="/admin/menu" class="rounded-2xl bg-choc-700 p-5 hover:bg-choc-600 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Menu</p>
+							<p class="mt-1 text-base font-bold text-van-100 group-hover:text-van-50 transition-colors">Menu Pricing →</p>
+							<p class="mt-1 text-xs text-van-300">Update item prices</p>
+						</a>
+						<a href="/admin/logs" class="rounded-2xl bg-straw-500 p-5 hover:bg-straw-600 transition-colors group">
+							<p class="text-xs font-semibold uppercase tracking-widest text-straw-100">Security</p>
+							<p class="mt-1 text-base font-bold text-white group-hover:text-van-50 transition-colors">Security Logs →</p>
+							<p class="mt-1 text-xs text-straw-200">Audit and filter security events</p>
+						</a>
+					</div>
+				</div>
+				<!-- Manage section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Manage</p>
+					<a href="/manager/orders" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+						<div>
+							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Orders</p>
+							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">All Orders</p>
+						</div>
+						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
 					</a>
 				</div>
-				<div class="grid grid-cols-2 gap-3">
-					<a href="/manager/orders" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Orders →</p>
-					</a>
-					<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
-						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
+				<!-- Account section -->
+				<div class="grid gap-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Account</p>
+					<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+						<div>
+							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
+							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
+						</div>
+						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
 					</a>
 				</div>
 			{/if}

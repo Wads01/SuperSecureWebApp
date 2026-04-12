@@ -64,24 +64,58 @@
 				</label>
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security question</span>
-					<input name="resetQuestion" type="text" required
+					<input name="resetQuestion" type="text" bind:value={resetQuestion} required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				{#if resetQuestion.length > 0}
+					<p class="text-xs {requirementClass(resetQuestion.length >= minResetQuestionLength)}">
+						{resetQuestion.length >= minResetQuestionLength ? '✓' : '✗'} Question must be at least {minResetQuestionLength} characters
+					</p>
+				{/if}
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security answer</span>
-					<input name="resetAnswer" type="password" required
+					<input name="resetAnswer" type="password" bind:value={resetAnswer} autocomplete="off" required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				{#if resetAnswer.length > 0}
+					<p class="text-xs {requirementClass(resetAnswer.length >= minResetAnswerLength)}">
+						{resetAnswer.length >= minResetAnswerLength ? '✓' : '✗'} Answer must be at least {minResetAnswerLength} characters
+					</p>
+				{/if}
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">New password</span>
-					<input name="newPassword" type="password" required
+					<input name="newPassword" type="password" bind:value={newPassword} autocomplete="new-password" required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				{#if newPassword.length > 0}
+					<div class="rounded-xl bg-van-200 p-3 text-xs grid gap-1">
+						<p class={requirementClass(newPassword.length >= minPasswordLength)}>
+							{newPassword.length >= minPasswordLength ? '✓' : '✗'} At least {minPasswordLength} characters
+						</p>
+						<p class={requirementClass(hasUppercase(newPassword))}>
+							{hasUppercase(newPassword) ? '✓' : '✗'} One uppercase letter
+						</p>
+						<p class={requirementClass(hasLowercase(newPassword))}>
+							{hasLowercase(newPassword) ? '✓' : '✗'} One lowercase letter
+						</p>
+						<p class={requirementClass(hasNumber(newPassword))}>
+							{hasNumber(newPassword) ? '✓' : '✗'} One number
+						</p>
+						<p class={requirementClass(hasSpecial(newPassword))}>
+							{hasSpecial(newPassword) ? '✓' : '✗'} One special character
+						</p>
+					</div>
+				{/if}
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Confirm new password</span>
-					<input name="confirmPassword" type="password" required
+					<input name="confirmPassword" type="password" bind:value={confirmPassword} autocomplete="new-password" required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				{#if confirmPassword.length > 0}
+					<p class="text-xs {requirementClass(newPassword === confirmPassword)}">
+						{newPassword === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+					</p>
+				{/if}
 				<button type="submit" class="mt-1 rounded-xl bg-straw-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
 					Reset password →
 				</button>
