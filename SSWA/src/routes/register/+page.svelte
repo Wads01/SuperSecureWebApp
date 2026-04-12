@@ -1,5 +1,38 @@
 <script lang="ts">
 	let { form } = $props();
+
+	const minPasswordLength = 12;
+	const minResetQuestionLength = 10;
+	const minResetAnswerLength = 3;
+
+	let password = $state('');
+	let confirmPassword = $state('');
+	let resetQuestion = $state('');
+	let resetAnswer = $state('');
+
+	function hasUppercase(value: string): boolean {
+		return /[A-Z]/.test(value);
+	}
+
+	function hasLowercase(value: string): boolean {
+		return /[a-z]/.test(value);
+	}
+
+	function hasNumber(value: string): boolean {
+		return /\d/.test(value);
+	}
+
+	function hasSpecial(value: string): boolean {
+		return /[^A-Za-z\d]/.test(value);
+	}
+
+	function hasLettersAndNumbers(value: string): boolean {
+		return /[A-Za-z]/.test(value) && /\d/.test(value);
+	}
+
+	function requirementClass(met: boolean): string {
+		return met ? 'text-green-700' : 'text-red-700';
+	}
 </script>
 
 <div class="min-h-screen bg-van-100 flex items-center justify-center p-4">
@@ -58,3 +91,86 @@
 
 	</div>
 </div>
+		<label class="flex flex-col gap-1">
+			<span class="text-sm font-medium">Password</span>
+			<input
+				name="password"
+				type="password"
+				autocomplete="new-password"
+				bind:value={password}
+				required
+				class="rounded border px-3 py-2"
+			/>
+		</label>
+
+		<div class="rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs">
+			<p class={requirementClass(password.length >= minPasswordLength)}>
+				Password should be length 12 or more.
+			</p>
+			<p class={requirementClass(hasUppercase(password))}>Password should include an uppercase letter.</p>
+			<p class={requirementClass(hasLowercase(password))}>Password should include a lowercase letter.</p>
+			<p class={requirementClass(hasNumber(password))}>Password should include a number.</p>
+			<p class={requirementClass(hasSpecial(password))}>Password should include a special character.</p>
+		</div>
+
+		<label class="flex flex-col gap-1">
+			<span class="text-sm font-medium">Confirm password</span>
+			<input
+				name="confirmPassword"
+				type="password"
+				autocomplete="new-password"
+				bind:value={confirmPassword}
+				required
+				class="rounded border px-3 py-2"
+			/>
+		</label>
+
+		<p class={`text-xs ${requirementClass(password.length > 0 && confirmPassword.length > 0 && password === confirmPassword)}`}>
+			Password and confirm password should match.
+		</p>
+
+		<label class="flex flex-col gap-1">
+			<span class="text-sm font-medium">Security reset question</span>
+			<input
+				name="resetQuestion"
+				type="text"
+				placeholder="Example: What was your first internship company code?"
+				bind:value={resetQuestion}
+				required
+				class="rounded border px-3 py-2"
+			/>
+		</label>
+
+		<p class={`text-xs ${requirementClass(resetQuestion.trim().length >= minResetQuestionLength)}`}>
+			Security question should be at least 10 characters.
+		</p>
+
+		<label class="flex flex-col gap-1">
+			<span class="text-sm font-medium">Security reset answer</span>
+			<input
+				name="resetAnswer"
+				type="password"
+				autocomplete="off"
+				bind:value={resetAnswer}
+				required
+				class="rounded border px-3 py-2"
+			/>
+		</label>
+
+		<div class="rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs">
+			<p class={requirementClass(resetAnswer.length >= minResetAnswerLength)}>
+				Security answer should be at least 3 characters.
+			</p>
+			<p class={requirementClass(hasLettersAndNumbers(resetAnswer))}>
+				Security answer should include letters and numbers.
+			</p>
+		</div>
+
+		<button type="submit" class="rounded bg-black px-3 py-2 text-white">Register</button>
+	</form>
+
+	<p class="text-sm text-gray-600">
+		Already registered?
+		<a href="/login" class="underline">Go to login</a>
+	</p>
+</main>
