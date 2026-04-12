@@ -2,41 +2,52 @@
 	let { form } = $props();
 </script>
 
-<main class="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 p-6">
-	<h1 class="text-2xl font-semibold">Login</h1>
+<div class="min-h-screen bg-van-100 flex items-center justify-center p-4">
+	<div class="w-full max-w-sm grid gap-3">
 
-	{#if form?.error}
-		<p class="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{form.error}</p>
-	{/if}
+		<div class="rounded-2xl bg-choc-800 p-5 text-van-100">
+			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">SSWA</p>
+			<h1 class="mt-1 text-2xl font-bold">Sign in</h1>
+		</div>
 
-	<form method="POST" class="flex flex-col gap-4 rounded border p-4">
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Email</span>
-			<input
-				name="email"
-				type="email"
-				autocomplete="email"
-				required
-				class="rounded border px-3 py-2"
-			/>
-		</label>
+		{#if form?.error}
+			<div class="rounded-2xl bg-straw-100 border-2 border-straw-500 p-4 text-sm font-semibold text-straw-600">
+				{form.error}
+			</div>
+		{/if}
 
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Password</span>
-			<input
-				name="password"
-				type="password"
-				autocomplete="current-password"
-				required
-				class="rounded border px-3 py-2"
-			/>
-		</label>
+		<div class="rounded-2xl bg-van-50 p-5">
+			<form method="POST" class="grid gap-3">
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Email</span>
+					<input
+						name="email"
+						type="email"
+						autocomplete="email"
+						required
+						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500"
+					/>
+				</label>
+				<label class="grid gap-1">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Password</span>
+					<input
+						name="password"
+						type="password"
+						autocomplete="current-password"
+						required
+						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500"
+					/>
+				</label>
+				<button type="submit" class="mt-1 rounded-xl bg-straw-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
+					Sign in →
+				</button>
+			</form>
+		</div>
 
-		<button type="submit" class="rounded bg-black px-3 py-2 text-white">Sign in</button>
-	</form>
+		<div class="rounded-2xl bg-van-200 p-4 flex items-center justify-between text-sm">
+			<a href="/register" class="font-semibold text-choc-800 hover:text-straw-500 transition-colors">Create account</a>
+			<a href="/forgot-password" class="text-choc-600 hover:text-straw-500 transition-colors">Forgot password?</a>
+		</div>
 
-	<p class="text-sm text-gray-600">
-		No account yet?
-		<a href="/register" class="underline">Create one</a>
-	</p>
-</main>
+	</div>
+</div>

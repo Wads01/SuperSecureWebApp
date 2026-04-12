@@ -1,5 +1,14 @@
-<main class="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center justify-center gap-4 p-6 text-center">
-	<h1 class="text-2xl font-semibold">403 - Access denied</h1>
-	<p class="text-gray-600">You do not have permission to access this resource.</p>
-	<a href="/" class="rounded bg-black px-3 py-2 text-white">Go to dashboard</a>
-</main>
+<div class="min-h-screen bg-van-100 flex items-center justify-center p-4">
+	<div class="w-full max-w-sm grid gap-3">
+		<div class="rounded-2xl bg-choc-800 p-5 text-van-100">
+			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">403</p>
+			<h1 class="mt-1 text-2xl font-bold">Access denied</h1>
+		</div>
+		<div class="rounded-2xl bg-straw-100 p-5">
+			<p class="text-sm text-straw-600">You do not have permission to access this resource.</p>
+		</div>
+		<a href="/" class="rounded-2xl bg-straw-500 p-4 text-center text-sm font-bold text-white hover:bg-straw-600 transition-colors">
+			← Go to dashboard
+		</a>
+	</div>
+</div>

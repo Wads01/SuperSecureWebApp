@@ -1,1 +1,30 @@
 @import 'tailwindcss';
+
+@theme {
+	--font-sans: 'Karla', sans-serif;
+
+	/* Neapolitan — Chocolate */
+	--color-choc-900: #1a0c04;
+	--color-choc-800: #2c1407;
+	--color-choc-700: #4a2010;
+	--color-choc-600: #6b3020;
+
+	/* Neapolitan — Vanilla */
+	--color-van-50:  #fffcf7;
+	--color-van-100: #fff8e8;
+	--color-van-200: #f5e6c0;
+	--color-van-300: #e8d0a0;
+
+	/* Neapolitan — Strawberry */
+	--color-straw-600: #a8304e;
+	--color-straw-500: #c94060;
+	--color-straw-400: #e05070;
+	--color-straw-200: #ffb3c1;
+	--color-straw-100: #ffd6de;
+}
+
+body {
+	background-color: #fff8e8;
+	font-family: 'Karla', sans-serif;
+	color: #2c1407;
+}
