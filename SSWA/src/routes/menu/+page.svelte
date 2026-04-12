@@ -2,71 +2,95 @@
 	let { data, form } = $props();
 </script>
 
-<main class="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 p-6">
-	<h1 class="text-2xl font-semibold">Cafe Menu</h1>
+<div class="min-h-screen bg-van-100 p-4">
+	<div class="mx-auto max-w-4xl grid gap-3">
 
-	<p class="text-sm text-gray-600">
-		Use this page to test frontend order creation against the secured `/api/orders` backend endpoint.
-	</p>
-
-	{#if form?.error}
-		<p class="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{form.error}</p>
-	{/if}
-
-	{#if form?.success}
-		<p class="rounded border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-700">
-			{form.success}
-			{#if form.createdOrderId}
-				Order ID: {form.createdOrderId}
-			{/if}
-		</p>
-	{/if}
-
-	<form method="POST" action="?/createOrder" class="space-y-4 rounded border p-4">
-		<div class="overflow-x-auto rounded border">
-			<table class="min-w-full text-sm">
-				<thead class="bg-gray-100 text-left">
-					<tr>
-						<th class="px-3 py-2">Item</th>
-						<th class="px-3 py-2">Category</th>
-						<th class="px-3 py-2">Price (PHP)</th>
-						<th class="px-3 py-2">Quantity (1-20)</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each data.items as item}
-						<tr class="border-t">
-							<td class="px-3 py-2">{item.name}</td>
-							<td class="px-3 py-2">{item.category}</td>
-							<td class="px-3 py-2">{item.pricePesos.toFixed(2)}</td>
-							<td class="px-3 py-2">
-								<input
-									type="number"
-									name={`qty_${item.id}`}
-									min="0"
-									max="20"
-									step="1"
-									value="0"
-									class="w-24 rounded border px-2 py-1"
-								/>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+		<!-- Header tile -->
+		<div class="rounded-2xl bg-choc-800 p-5 flex items-center justify-between text-van-100">
+			<div>
+				<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Cafe</p>
+				<h1 class="mt-0.5 text-2xl font-bold">Menu</h1>
+			</div>
+			<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
+				← Dashboard
+			</a>
 		</div>
 
-		<label class="flex flex-col gap-1">
-			<span class="text-sm font-medium">Order Notes (optional, max 300)</span>
-			<textarea name="notes" rows="3" maxlength="300" class="rounded border px-3 py-2"></textarea>
-		</label>
-
-		{#if data.userRole === 'USER'}
-			<button type="submit" class="rounded bg-black px-3 py-2 text-white">Create Order</button>
-		{:else}
-			<p class="text-sm text-amber-700">
-				Only users with Role B can submit orders. Other roles can still use this page to view menu data.
-			</p>
+		{#if form?.error}
+			<div class="rounded-2xl bg-straw-100 border-2 border-straw-500 p-4 text-sm font-semibold text-straw-600">
+				{form.error}
+			</div>
 		{/if}
-	</form>
-</main>
+
+		{#if form?.success}
+			<div class="rounded-2xl bg-van-200 border-2 border-van-300 p-4 text-sm font-semibold text-choc-800">
+				{form.success}
+				{#if form.createdOrderId}
+					<span class="ml-2 font-mono text-xs">{form.createdOrderId}</span>
+				{/if}
+			</div>
+		{/if}
+
+		<!-- Menu table + order form -->
+		<form method="POST" action="?/createOrder" class="grid gap-3">
+			<div class="rounded-2xl bg-van-50 overflow-hidden">
+				<div class="p-4 pb-2">
+					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">{data.items.length} items available</p>
+				</div>
+				<div class="overflow-x-auto px-4 pb-4">
+					<table class="min-w-full text-sm">
+						<thead>
+							<tr class="border-b-2 border-van-300">
+								<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Item</th>
+								<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Category</th>
+								<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Price (PHP)</th>
+								<th class="pb-2 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Qty (1–20)</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-van-200">
+							{#each data.items as item}
+								<tr class="hover:bg-van-100 transition-colors">
+									<td class="py-3 pr-4 font-semibold text-choc-800">{item.name}</td>
+									<td class="py-3 pr-4">
+										<span class="rounded-lg bg-van-200 px-2 py-0.5 text-xs font-bold text-choc-700">{item.category}</span>
+									</td>
+									<td class="py-3 pr-4 text-sm font-semibold text-choc-800">{item.pricePesos.toFixed(2)}</td>
+									<td class="py-3">
+										<input
+											type="number"
+											name={`qty_${item.id}`}
+											min="0"
+											max="20"
+											step="1"
+											value="0"
+											class="w-20 rounded-xl border-2 border-van-300 bg-van-100 px-2 py-1 text-sm text-choc-800 outline-none focus:border-straw-500"
+										/>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="rounded-2xl bg-van-50 p-5 grid gap-4">
+				<label class="grid gap-1.5">
+					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Order notes (optional, max 300)</span>
+					<textarea name="notes" rows="3" maxlength="300"
+						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2 text-sm text-choc-800 outline-none focus:border-straw-500 resize-none"></textarea>
+				</label>
+
+				{#if data.userRole === 'USER'}
+					<button type="submit" class="rounded-xl bg-straw-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-straw-600 transition-colors self-start">
+						Place Order →
+					</button>
+				{:else}
+					<p class="rounded-xl bg-straw-100 border-2 border-straw-500 px-4 py-3 text-sm font-semibold text-straw-600">
+						Only customers can place orders.
+					</p>
+				{/if}
+			</div>
+		</form>
+
+	</div>
+</div>

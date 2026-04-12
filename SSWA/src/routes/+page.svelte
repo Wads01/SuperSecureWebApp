@@ -58,46 +58,62 @@
 			</div>
 
 			<!-- Navigation bento tiles -->
-			<div class="grid gap-3 {data.user.role === 'ADMIN' ? 'grid-cols-3' : 'grid-cols-2'}">
-				<a href="/manager/users" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
-					<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Users →</p>
-				</a>
-				<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
-					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
-					<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
-				</a>
-				{#if data.user.role === 'ADMIN'}
+			{#if data.user.role === 'USER'}
+				<div class="grid grid-cols-3 gap-3">
+					<a href="/menu" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Cafe</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Menu / Order →</p>
+					</a>
+					<a href="/orders/me" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Cafe</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">My Orders →</p>
+					</a>
+					<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
+					</a>
+				</div>
+			{:else if data.user.role === 'MANAGER'}
+				<div class="grid grid-cols-3 gap-3">
+					<a href="/manager/orders" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Orders →</p>
+					</a>
+					<a href="/manager/users" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Users →</p>
+					</a>
+					<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
+					</a>
+				</div>
+			{:else if data.user.role === 'ADMIN'}
+				<div class="grid grid-cols-3 gap-3">
+					<a href="/admin/users" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Admin</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Users →</p>
+					</a>
+					<a href="/admin/menu" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Admin</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Menu Pricing →</p>
+					</a>
 					<a href="/admin/logs" class="rounded-2xl bg-straw-500 p-5 hover:bg-straw-600 transition-colors">
 						<p class="text-xs font-semibold uppercase tracking-widest text-straw-100">Admin</p>
-						<p class="mt-1 text-base font-bold text-white">Security logs →</p>
+						<p class="mt-1 text-base font-bold text-white">Security Logs →</p>
 					</a>
-				{/if}
-			</div>
-		{/if}
-
-		<div class="rounded border p-4">
-			<p><span class="font-medium">Email:</span> {data.user.email}</p>
-			<p><span class="font-medium">Role:</span> {data.user.role}</p>
-			<p><span class="font-medium">Status:</span> {data.user.status}</p>
-		</div>
-
-		<nav class="flex flex-wrap gap-2">
-			<a href="/menu" class="rounded border px-3 py-2">Menu / Create Order</a>
-			<a href="/orders/me" class="rounded border px-3 py-2">My Orders</a>
-			<a href="/manager/orders" class="rounded border px-3 py-2">Manager Orders</a>
-			<a href="/manager/users" class="rounded border px-3 py-2">User Management</a>
-			<a href="/account/password" class="rounded border px-3 py-2">Change Password</a>
-			<a href="/forgot-password" class="rounded border px-3 py-2">Forgot Password</a>
-			{#if data.user.role === 'ADMIN'}
-				<a href="/admin/users" class="rounded border px-3 py-2">Admin Users</a>
-				<a href="/admin/menu" class="rounded border px-3 py-2">Menu Pricing</a>
-				<a href="/admin/logs" class="rounded border px-3 py-2">Security Logs</a>
+				</div>
+				<div class="grid grid-cols-2 gap-3">
+					<a href="/manager/orders" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Manage</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Orders →</p>
+					</a>
+					<a href="/account/password" class="rounded-2xl bg-van-200 p-5 hover:bg-van-300 transition-colors group">
+						<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Account</p>
+						<p class="mt-1 text-base font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change password →</p>
+					</a>
+				</div>
 			{/if}
-		</nav>
-
-		<form method="POST" action="/logout">
-			<button type="submit" class="rounded bg-black px-3 py-2 text-white">Sign out</button>
-		</form>
-	{/if}
-</main>
+		{/if}
+	</div>
+</div>

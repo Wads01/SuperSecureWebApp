@@ -11,83 +11,97 @@
 </script>
 
 <main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 p-6">
-	<h1 class="text-2xl font-semibold">Manager Orders Dashboard</h1>
+	<!-- Header tile -->
+	<div class="rounded-2xl bg-choc-800 p-5 flex items-center justify-between text-van-100">
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Manager</p>
+			<h1 class="mt-0.5 text-2xl font-bold">Orders</h1>
+		</div>
+		<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
+			← Dashboard
+		</a>
+	</div>
 
-	<p class="text-sm text-gray-600">Use this page to test manager/admin order reads and status transitions.</p>
-
-	{#if data.error}
-		<p class="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{data.error}</p>
-	{/if}
-
-	{#if form?.error}
-		<p class="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{form.error}</p>
+	{#if data.error || form?.error}
+		<div class="rounded-2xl bg-straw-100 border-2 border-straw-500 p-4 text-sm font-semibold text-straw-600">
+			{data.error ?? form?.error}
+		</div>
 	{/if}
 
 	{#if form?.success}
-		<p class="rounded border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-700">{form.success}</p>
+		<div class="rounded-2xl bg-van-200 border-2 border-van-300 p-4 text-sm font-semibold text-choc-800">
+			{form.success}
+		</div>
 	{/if}
 
-	<div class="overflow-x-auto rounded border">
-		<table class="min-w-full text-sm">
-			<thead class="bg-gray-100 text-left">
-				<tr>
-					<th class="px-3 py-2">Order</th>
-					<th class="px-3 py-2">User</th>
-					<th class="px-3 py-2">Scope</th>
-					<th class="px-3 py-2">Status</th>
-					<th class="px-3 py-2">Total (PHP)</th>
-					<th class="px-3 py-2">Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each data.orders as order}
-					<tr class="border-t">
-						<td class="px-3 py-2">
-							<p>{order.id}</p>
-							<p class="text-xs text-gray-500">{new Date(order.createdAt).toLocaleString()}</p>
-						</td>
-						<td class="px-3 py-2">{order.user.email}</td>
-						<td class="px-3 py-2">{order.scopeId ?? '-'}</td>
-						<td class="px-3 py-2">{order.status}</td>
-						<td class="px-3 py-2">{order.totalPesos.toFixed(2)}</td>
-						<td class="px-3 py-2">
-							<form method="POST" action="?/setStatus" class="flex items-center gap-2">
-								<input type="hidden" name="orderId" value={order.id} />
-								<select name="status" class="rounded border px-2 py-1">
-									{#each data.statusOptions as status}
-										<option value={status} selected={status === order.status}>{status}</option>
-									{/each}
-								</select>
-								<button type="submit" class="rounded bg-black px-2 py-1 text-white">Apply</button>
-							</form>
-						</td>
+	<!-- Orders table bento block -->
+	<div class="rounded-2xl bg-van-50 overflow-hidden">
+		<div class="p-4 pb-2">
+			<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">
+				{data.totalCount} {data.totalCount === 1 ? 'order' : 'orders'}
+			</p>
+		</div>
+		<div class="overflow-x-auto px-4 pb-4">
+			<table class="min-w-full text-sm">
+				<thead>
+					<tr class="border-b-2 border-van-300">
+						<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Order</th>
+						<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">User</th>
+						<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Scope</th>
+						<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Status</th>
+						<th class="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Total (PHP)</th>
+						<th class="pb-2 text-left text-xs font-semibold uppercase tracking-widest text-choc-600">Action</th>
 					</tr>
-				{/each}
-				{#if data.orders.length === 0}
-					<tr class="border-t">
-						<td colspan="6" class="px-3 py-4 text-center text-gray-500">No orders found.</td>
-					</tr>
-				{/if}
-			</tbody>
-		</table>
+				</thead>
+				<tbody class="divide-y divide-van-200">
+					{#each data.orders as order}
+						<tr class="hover:bg-van-100 transition-colors">
+							<td class="py-3 pr-4">
+								<p class="font-mono text-xs font-semibold text-choc-800">{order.id}</p>
+								<p class="text-xs text-choc-600">{new Date(order.createdAt).toLocaleString()}</p>
+							</td>
+							<td class="py-3 pr-4 text-sm font-semibold text-choc-800">{order.user.email}</td>
+							<td class="py-3 pr-4 font-mono text-xs text-choc-600">{order.scopeId ?? '-'}</td>
+							<td class="py-3 pr-4">
+								<span class="rounded-lg bg-van-200 px-2 py-0.5 text-xs font-bold text-choc-700">{order.status}</span>
+							</td>
+							<td class="py-3 pr-4 text-sm font-semibold text-choc-800">{order.totalPesos.toFixed(2)}</td>
+							<td class="py-3">
+								<form method="POST" action="?/setStatus" class="flex items-center gap-2">
+									<input type="hidden" name="orderId" value={order.id} />
+									<select name="status" class="rounded-xl border-2 border-van-300 bg-van-100 px-2 py-1 text-sm text-choc-800 outline-none focus:border-straw-500">
+										{#each data.statusOptions as status}
+											<option value={status} selected={status === order.status}>{status}</option>
+										{/each}
+									</select>
+									<button type="submit" class="rounded-xl bg-straw-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-straw-600 transition-colors">Apply</button>
+								</form>
+							</td>
+						</tr>
+					{/each}
+					{#if data.orders.length === 0}
+						<tr>
+							<td colspan="6" class="py-8 text-center text-sm text-choc-600">No orders found.</td>
+						</tr>
+					{/if}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
-	<div class="flex items-center gap-2">
+	<!-- Pagination -->
+	<div class="flex items-center gap-3">
 		{#if canGoPrevious()}
-			<a
-				href={`/manager/orders?page=${data.page - 1}&pageSize=${data.pageSize}`}
-				class="rounded border px-3 py-2"
-			>
-				Previous
+			<a href={`/manager/orders?page=${data.page - 1}&pageSize=${data.pageSize}`}
+				class="rounded-xl bg-van-200 px-4 py-2 text-sm font-semibold text-choc-800 hover:bg-van-300 transition-colors">
+				← Previous
 			</a>
 		{/if}
-		<span class="text-sm text-gray-700">Page {data.page} | Total Orders: {data.totalCount}</span>
+		<span class="text-sm text-choc-600">Page {data.page} · {data.totalCount} orders</span>
 		{#if canGoNext()}
-			<a
-				href={`/manager/orders?page=${data.page + 1}&pageSize=${data.pageSize}`}
-				class="rounded border px-3 py-2"
-			>
-				Next
+			<a href={`/manager/orders?page=${data.page + 1}&pageSize=${data.pageSize}`}
+				class="rounded-xl bg-van-200 px-4 py-2 text-sm font-semibold text-choc-800 hover:bg-van-300 transition-colors">
+				Next →
 			</a>
 		{/if}
 	</div>
