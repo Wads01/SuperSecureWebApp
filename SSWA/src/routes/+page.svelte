@@ -31,10 +31,15 @@
 		</div>
 
 		<nav class="flex flex-wrap gap-2">
+			<a href="/menu" class="rounded border px-3 py-2">Menu / Create Order</a>
+			<a href="/orders/me" class="rounded border px-3 py-2">My Orders</a>
+			<a href="/manager/orders" class="rounded border px-3 py-2">Manager Orders</a>
 			<a href="/manager/users" class="rounded border px-3 py-2">User Management</a>
 			<a href="/account/password" class="rounded border px-3 py-2">Change Password</a>
 			<a href="/forgot-password" class="rounded border px-3 py-2">Forgot Password</a>
 			{#if data.user.role === 'ADMIN'}
+				<a href="/admin/users" class="rounded border px-3 py-2">Admin Users</a>
+				<a href="/admin/menu" class="rounded border px-3 py-2">Menu Pricing</a>
 				<a href="/admin/logs" class="rounded border px-3 py-2">Security Logs</a>
 			{/if}
 		</nav>
