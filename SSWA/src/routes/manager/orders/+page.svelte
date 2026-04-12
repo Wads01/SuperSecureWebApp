@@ -10,17 +10,21 @@
 	}
 </script>
 
-<main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 p-6">
-	<!-- Header tile -->
-	<div class="rounded-2xl bg-choc-800 p-5 flex items-center justify-between text-van-100">
-		<div>
+<div class="min-h-screen bg-van-100">
+	<!-- Full-width header -->
+	<div class="bg-choc-800 px-8 py-6 grid grid-cols-3 items-center text-van-100">
+		<div></div>
+		<div class="text-center">
 			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Manager</p>
-			<h1 class="mt-0.5 text-2xl font-bold">Orders</h1>
+			<h1 class="mt-0.5 text-4xl font-bold">Orders</h1>
 		</div>
-		<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
-			← Dashboard
-		</a>
+		<div class="flex justify-end">
+			<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
+				← Dashboard
+			</a>
+		</div>
 	</div>
+	<main class="w-full flex flex-col gap-6 px-8 py-6">
 
 	{#if data.error || form?.error}
 		<div class="rounded-2xl bg-straw-100 border-2 border-straw-500 p-4 text-sm font-semibold text-straw-600">
@@ -105,4 +109,5 @@
 			</a>
 		{/if}
 	</div>
-</main>
+	</main>
+</div>

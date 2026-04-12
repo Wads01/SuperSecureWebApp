@@ -26,29 +26,28 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-<div class="mx-auto w-full max-w-6xl px-4 pt-4">
-	<div class="flex flex-wrap items-center gap-2">
-		{#if showBackButton}
-			<button
-				type="button"
-				onclick={navigateBack}
-				class="rounded border px-3 py-2 text-sm hover:bg-gray-100"
-			>
-				Back
-			</button>
-		{/if}
-
-		{#if data.user && secondaryLinks.length > 0}
+{#if data.user && (showBackButton || secondaryLinks.length > 0)}
+	<div class="mx-auto w-full max-w-6xl px-4 pt-4 pb-1.5">
+		<div class="flex flex-wrap items-center justify-center gap-2">
+			{#if showBackButton}
+				<button
+					type="button"
+					onclick={navigateBack}
+					class="rounded-xl bg-van-200 px-3 py-1.5 text-xs font-semibold text-choc-700 hover:bg-van-300 transition-colors"
+				>
+					← Back
+				</button>
+			{/if}
 			{#each secondaryLinks as link}
 				<a
 					href={link.href}
-					class={`rounded border px-3 py-2 text-sm hover:bg-gray-100 ${page.url.pathname === link.href ? 'bg-gray-100 font-medium' : ''}`}
+					class="rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors {page.url.pathname === link.href ? 'bg-choc-800 text-van-100' : 'bg-van-200 text-choc-700 hover:bg-van-300'}"
 				>
 					{link.label}
 				</a>
 			{/each}
-		{/if}
+		</div>
 	</div>
-</div>
+{/if}
 
 {@render children()}

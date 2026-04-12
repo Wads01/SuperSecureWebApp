@@ -1,26 +1,25 @@
 <script lang="ts">
-	import { getDashboardNavLinks } from '$lib/navigation/role-nav';
-
 	let { data } = $props();
-
-	const dashboardLinks = $derived(getDashboardNavLinks(data.user?.role));
 </script>
 
-<div class="min-h-screen bg-van-100 p-4">
-	<div class="mx-auto max-w-3xl grid gap-3">
-
-		<!-- Header tile -->
-		<div class="rounded-2xl bg-choc-800 p-5 flex items-center justify-between text-van-100">
-			<div>
-				<p class="text-xs font-semibold uppercase tracking-widest text-van-300">SSWA</p>
-				<h1 class="mt-0.5 text-2xl font-bold">Dashboard</h1>
-			</div>
+<div class="min-h-screen bg-van-100">
+	<!-- Full-width header -->
+	<div class="bg-choc-800 px-8 py-6 grid grid-cols-3 items-center text-van-100">
+		<div></div>
+		<div class="text-center">
+			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">The Cozy Bean</p>
+			<h1 class="mt-0.5 text-4xl font-bold">Dashboard</h1>
+		</div>
+		<div class="flex justify-end">
 			<form method="POST" action="/logout">
 				<button type="submit" class="rounded-xl bg-straw-500 px-4 py-2 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
 					Sign out
 				</button>
 			</form>
 		</div>
+	</div>
+	<div class="px-8 py-4">
+		<div class="grid gap-3">
 
 		{#if data.user}
 			<!-- Account info + last-use: 2-col bento row -->
@@ -33,13 +32,8 @@
 						<span class="rounded-lg bg-choc-700 px-2.5 py-1 text-xs font-bold">{data.user.status}</span>
 					</div>
 				</div>
-		<nav class="flex flex-wrap gap-2">
-			{#each dashboardLinks as link}
-				<a href={link.href} class="rounded border px-3 py-2">{link.label}</a>
-			{/each}
-		</nav>
 
-				<div class="rounded-2xl bg-straw-100 p-5">
+			<div class="rounded-2xl bg-straw-100 p-5">
 					<p class="text-xs font-semibold uppercase tracking-widest text-straw-600">Last activity</p>
 					{#if data.lastAccountUse}
 						<div class="mt-2 grid gap-2">
@@ -124,5 +118,6 @@
 				</div>
 			{/if}
 		{/if}
+		</div>
 	</div>
 </div>

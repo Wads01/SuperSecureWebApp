@@ -6,24 +6,25 @@
 	}
 </script>
 
-<div class="min-h-screen bg-van-100 p-4">
-	<div class="mx-auto max-w-4xl grid gap-3">
-
-		<!-- Header tile -->
-		<div class="rounded-2xl bg-choc-800 p-5 flex items-center justify-between text-van-100">
-			<div>
-				<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Cafe</p>
-				<h1 class="mt-0.5 text-2xl font-bold">My Orders</h1>
-			</div>
-			<div class="flex gap-2">
-				<a href="/menu" class="rounded-xl bg-straw-500 px-4 py-2 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
-					New Order →
-				</a>
-				<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
-					← Dashboard
-				</a>
-			</div>
+<div class="min-h-screen bg-van-100">
+	<!-- Full-width header -->
+	<div class="bg-choc-800 px-8 py-6 grid grid-cols-3 items-center text-van-100">
+		<div></div>
+		<div class="text-center">
+			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">Cafe</p>
+			<h1 class="mt-0.5 text-4xl font-bold">My Orders</h1>
 		</div>
+		<div class="flex justify-end gap-2">
+			<a href="/menu" class="rounded-xl bg-straw-500 px-4 py-2 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
+				New Order →
+			</a>
+			<a href="/" class="rounded-xl bg-choc-700 px-4 py-2 text-sm font-semibold text-van-100 hover:bg-choc-600 transition-colors">
+				← Dashboard
+			</a>
+		</div>
+	</div>
+	<div class="px-8 py-4">
+		<div class="grid gap-3">
 
 		{#if form?.error}
 			<div class="rounded-2xl bg-straw-100 border-2 border-straw-500 p-4 text-sm font-semibold text-straw-600">
@@ -103,5 +104,6 @@
 			</div>
 		{/if}
 
+		</div>
 	</div>
 </div>

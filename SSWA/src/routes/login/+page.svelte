@@ -6,7 +6,7 @@
 	<div class="w-full max-w-sm grid gap-3">
 
 		<div class="rounded-2xl bg-choc-800 p-5 text-van-100">
-			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">SSWA</p>
+			<p class="text-xs font-semibold uppercase tracking-widest text-van-300">The Cozy Bean</p>
 			<h1 class="mt-1 text-2xl font-bold">Sign in</h1>
 		</div>
 
