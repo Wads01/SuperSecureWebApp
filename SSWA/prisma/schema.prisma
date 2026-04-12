@@ -1,13 +1,231 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
-  output   = "../../generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  LOCKED
+  DISABLED
+}
+
+enum SecurityEventType {
+  AUTH_LOGIN
+  AUTH_LOGOUT
+  AUTH_REGISTER
+  AUTH_PASSWORD_CHANGE
+  AUTH_PASSWORD_RESET
+  AUTH_REAUTH
+  AUTH_LOCKOUT
+  AUTHZ_ACCESS
+  VALIDATION
+  TASK_CRUD
+  USER_MANAGEMENT
+}
+
+enum SecurityEventOutcome {
+  SUCCESS
+  FAILURE
+  DENIED
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+enum MenuCategory {
+  COFFEE
+  NON_COFFEE
+  PASTRY
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  COMPLETED
+  CANCELLED
+}
+
+model Scope {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(120)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  tasks Task[]
+  orders Order[]
+}
+
+model User {
+  id                 String     @id @default(uuid()) @db.Uuid
+  email              String     @unique @db.VarChar(320)
+  role               UserRole
+  status             UserStatus @default(ACTIVE)
+  passwordHash       String
+  resetQuestion      String?    @db.VarChar(200)
+  resetAnswerHash    String?
+  failedLoginCount   Int        @default(0)
+  lockoutUntil       DateTime?
+  passwordChangedAt  DateTime   @default(now())
+  lastLoginAt        DateTime?
+  lastLoginSuccessAt DateTime?
+  lastLoginFailureAt DateTime?
+  scopeId            String?    @db.Uuid
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  scope           Scope?            @relation(fields: [scopeId], references: [id], onDelete: SetNull)
+  sessions        Session[]
+  passwordHistory PasswordHistory[]
+  securityLogs    SecurityLog[]     @relation("SecurityLogActor")
+
+  ownedTasks    Task[] @relation("TaskOwner")
+  managedTasks  Task[] @relation("TaskManager")
+  createdTasks  Task[] @relation("TaskCreatedBy")
+  updatedTasks  Task[] @relation("TaskUpdatedBy")
+  orders        Order[]
+
+  @@index([role])
+  @@index([status])
+  @@index([scopeId])
+}
+
+model Session {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @db.Uuid
+  sessionTokenHash String   @unique
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  lastSeenAt       DateTime @default(now())
+  ip               String?  @db.VarChar(64)
+  userAgent        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordHistory {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model SecurityLog {
+  id           String               @id @default(uuid()) @db.Uuid
+  actorUserId  String?              @db.Uuid
+  eventType    SecurityEventType
+  outcome      SecurityEventOutcome
+  route        String?              @db.VarChar(255)
+  resourceType String?              @db.VarChar(80)
+  resourceId   String?              @db.VarChar(120)
+  ip           String?              @db.VarChar(64)
+  userAgent    String?
+  metadataJson Json?
+  createdAt    DateTime             @default(now())
+
+  actor User? @relation("SecurityLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId])
+  @@index([eventType, outcome])
+  @@index([createdAt])
+}
+
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  title       String     @db.VarChar(140)
+  description String?
+  status      TaskStatus @default(OPEN)
+  ownerUserId String     @db.Uuid
+  managerId   String?    @db.Uuid
+  scopeId     String?    @db.Uuid
+  createdById String?    @db.Uuid
+  updatedById String?    @db.Uuid
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  owner     User   @relation("TaskOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
+  manager   User?  @relation("TaskManager", fields: [managerId], references: [id], onDelete: SetNull)
+  scope     Scope? @relation(fields: [scopeId], references: [id], onDelete: SetNull)
+  createdBy User?  @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User?  @relation("TaskUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([ownerUserId])
+  @@index([managerId])
+  @@index([scopeId])
+  @@index([status])
+}
+
+model MenuItem {
+  id         String       @id @default(uuid()) @db.Uuid
+  name       String       @unique @db.VarChar(120)
+  category   MenuCategory
+  pricePesos Decimal      @db.Decimal(10, 2)
+  isAvailable Boolean     @default(true)
+  sortOrder  Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([category])
+  @@index([isAvailable])
+  @@index([sortOrder])
+}
+
+model Order {
+  id         String      @id @default(uuid()) @db.Uuid
+  userId     String      @db.Uuid
+  scopeId    String?     @db.Uuid
+  status     OrderStatus @default(PENDING)
+  totalPesos Decimal     @db.Decimal(10, 2)
+  notes      String?     @db.VarChar(300)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scope     Scope?    @relation(fields: [scopeId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
+
+  @@index([userId])
+  @@index([scopeId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id             String   @id @default(uuid()) @db.Uuid
+  orderId        String   @db.Uuid
+  menuItemId     String   @db.Uuid
+  quantity       Int
+  unitPricePesos Decimal  @db.Decimal(10, 2)
+  lineTotalPesos Decimal  @db.Decimal(10, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([menuItemId])
 }
