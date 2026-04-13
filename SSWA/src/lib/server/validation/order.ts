@@ -43,7 +43,7 @@ export const managerUpdateOrderStatusSchema = z.object({
 });
 
 export const adminAssignRoleSchema = z.object({
-	role: z.enum([UserRole.ADMIN, UserRole.MANAGER])
+	role: z.enum([UserRole.ADMIN, UserRole.MANAGER, UserRole.USER])
 });
 
 export const adminUpdateMenuPriceSchema = z.object({

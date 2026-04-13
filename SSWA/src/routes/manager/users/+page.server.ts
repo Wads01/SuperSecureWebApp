@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const users = await prisma.user.findMany({
 		where: {
 			role: UserRole.USER,
-			scopeId: locals.user.scopeId
+			OR: [{ scopeId: locals.user.scopeId }, { scopeId: null }]
 		},
 		orderBy: { createdAt: 'desc' },
 		select: {

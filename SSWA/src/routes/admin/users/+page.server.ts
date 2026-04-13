@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	return {
 		users,
-		assignableRoles: [UserRole.ADMIN, UserRole.MANAGER]
+		assignableRoles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.USER]
 	};
 };
 

@@ -54,7 +54,15 @@ export function canManageUser(actor: CurrentUser, target: { role: UserRole; scop
 	}
 
 	if (actor.role === UserRole.MANAGER) {
-		return target.role === UserRole.USER && actor.scopeId !== null && actor.scopeId === target.scopeId;
+		if (target.role !== UserRole.USER) {
+			return false;
+		}
+
+		if (target.scopeId === null) {
+			return true;
+		}
+
+		return actor.scopeId !== null && actor.scopeId === target.scopeId;
 	}
 
 	return false;
@@ -73,7 +81,7 @@ export function canAssignRole(actor: CurrentUser, targetRole: UserRole): boolean
 		return false;
 	}
 
-	return roleRank(targetRole) >= 2;
+	return roleRank(targetRole) >= 1;
 }
 
 export function assertRole(user: App.Locals['user'], allowedRoles: UserRole[]): asserts user is CurrentUser {

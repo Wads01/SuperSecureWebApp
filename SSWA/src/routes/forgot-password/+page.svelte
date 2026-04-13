@@ -31,7 +31,7 @@
 	}
 
 	function requirementClass(met: boolean): string {
-		return met ? 'text-green-700' : 'text-red-700';
+		return met ? 'text-emerald-700' : 'text-straw-600';
 	}
 </script>
 
@@ -68,7 +68,7 @@
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
 				{#if resetQuestion.length > 0}
-					<p class="text-xs {requirementClass(resetQuestion.length >= minResetQuestionLength)}">
+					<p class={`text-xs ${requirementClass(resetQuestion.length >= minResetQuestionLength)}`}>
 						{resetQuestion.length >= minResetQuestionLength ? '✓' : '✗'} Question must be at least {minResetQuestionLength} characters
 					</p>
 				{/if}
@@ -78,8 +78,11 @@
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
 				{#if resetAnswer.length > 0}
-					<p class="text-xs {requirementClass(resetAnswer.length >= minResetAnswerLength)}">
+					<p class={`text-xs ${requirementClass(resetAnswer.length >= minResetAnswerLength)}`}>
 						{resetAnswer.length >= minResetAnswerLength ? '✓' : '✗'} Answer must be at least {minResetAnswerLength} characters
+					</p>
+					<p class={`text-xs ${requirementClass(hasLettersAndNumbers(resetAnswer))}`}>
+						{hasLettersAndNumbers(resetAnswer) ? '✓' : '✗'} Answer should include letters and numbers
 					</p>
 				{/if}
 				<label class="grid gap-1">
@@ -103,6 +106,9 @@
 						</p>
 						<p class={requirementClass(hasSpecial(newPassword))}>
 							{hasSpecial(newPassword) ? '✓' : '✗'} One special character
+						</p>
+						<p class="text-straw-600">
+							• Password re-use is not allowed (verified by server on submit)
 						</p>
 					</div>
 				{/if}
