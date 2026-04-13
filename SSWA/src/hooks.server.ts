@@ -1,6 +1,7 @@
 import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
+import { UserStatus } from '../generated/prisma/enums';
 import { getSessionFromToken } from '$lib/server/auth/service';
-import { SESSION_COOKIE_NAME } from '$lib/server/auth/session';
+import { clearSessionCookie, SESSION_COOKIE_NAME } from '$lib/server/auth/session';
 import { isAllowedPath } from '$lib/server/authorization/policy';
 import { writeSecurityLog } from '$lib/server/logging/security-log';
 
@@ -15,6 +16,8 @@ function isPublicPath(pathname: string): boolean {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+	const pathname = event.url.pathname;
+	const publicPath = isPublicPath(pathname);
 	const token = event.cookies.get(SESSION_COOKIE_NAME);
 
 	event.locals.user = null;
@@ -28,8 +31,24 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	const pathname = event.url.pathname;
-	const publicPath = isPublicPath(pathname);
+	if (event.locals.user && event.locals.user.status !== UserStatus.ACTIVE) {
+		await writeSecurityLog({
+			actorUserId: event.locals.user.id,
+			eventType: 'AUTHZ_ACCESS',
+			outcome: 'DENIED',
+			route: pathname,
+			ip: event.getClientAddress(),
+			userAgent: event.request.headers.get('user-agent'),
+			metadataJson: {
+				reason: 'inactive_account_status',
+				status: event.locals.user.status
+			}
+		});
+
+		clearSessionCookie(event.cookies);
+		event.locals.user = null;
+		event.locals.session = null;
+	}
 
 	if (!event.locals.user && !publicPath) {
 		throw redirect(303, '/login');
