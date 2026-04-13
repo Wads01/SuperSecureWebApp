@@ -31,7 +31,7 @@
 	}
 
 	function requirementClass(met: boolean): string {
-		return met ? 'text-green-700' : 'text-red-700';
+		return met ? 'text-emerald-700' : 'text-straw-600';
 	}
 </script>
 
@@ -58,26 +58,54 @@
 				</label>
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Password</span>
-					<input name="password" type="password" autocomplete="new-password" required
+					<input name="password" type="password" autocomplete="new-password" bind:value={password} required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				<div class="rounded-xl bg-van-200 p-3 text-xs grid gap-1">
+					<p class={requirementClass(password.length >= minPasswordLength)}>
+						{password.length >= minPasswordLength ? '✓' : '✗'} Password should be length {minPasswordLength} or more
+					</p>
+					<p class={requirementClass(hasUppercase(password))}>
+						{hasUppercase(password) ? '✓' : '✗'} Include at least one uppercase letter
+					</p>
+					<p class={requirementClass(hasLowercase(password))}>
+						{hasLowercase(password) ? '✓' : '✗'} Include at least one lowercase letter
+					</p>
+					<p class={requirementClass(hasNumber(password))}>
+						{hasNumber(password) ? '✓' : '✗'} Include at least one number
+					</p>
+					<p class={requirementClass(hasSpecial(password))}>
+						{hasSpecial(password) ? '✓' : '✗'} Include at least one special character
+					</p>
+				</div>
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Confirm password</span>
-					<input name="confirmPassword" type="password" autocomplete="new-password" required
+					<input name="confirmPassword" type="password" autocomplete="new-password" bind:value={confirmPassword} required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				<p class={`text-xs ${requirementClass(password.length > 0 && confirmPassword.length > 0 && password === confirmPassword)}`}>
+					{password.length > 0 && confirmPassword.length > 0 && password === confirmPassword ? '✓' : '✗'} Password and confirm password should match
+				</p>
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security question</span>
-					<input name="resetQuestion" type="text" placeholder="e.g. First internship company code?" required
+					<input name="resetQuestion" type="text" placeholder="e.g. First internship company code?" bind:value={resetQuestion} required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
+				<p class={`text-xs ${requirementClass(resetQuestion.trim().length >= minResetQuestionLength)}`}>
+					{resetQuestion.trim().length >= minResetQuestionLength ? '✓' : '✗'} Security question should be at least {minResetQuestionLength} characters
+				</p>
 				<label class="grid gap-1">
 					<span class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security answer</span>
-					<input name="resetAnswer" type="password" autocomplete="off" required
+					<input name="resetAnswer" type="password" autocomplete="off" bind:value={resetAnswer} required
 						class="rounded-xl border-2 border-van-300 bg-van-100 px-3 py-2.5 text-sm text-choc-800 outline-none focus:border-straw-500" />
 				</label>
-				<div class="rounded-xl bg-van-200 p-3 text-xs text-choc-600">
-					Password needs 12+ chars, uppercase, lowercase, number and special character.
+				<div class="rounded-xl bg-van-200 p-3 text-xs grid gap-1">
+					<p class={requirementClass(resetAnswer.length >= minResetAnswerLength)}>
+						{resetAnswer.length >= minResetAnswerLength ? '✓' : '✗'} Security answer should be at least {minResetAnswerLength} characters
+					</p>
+					<p class={requirementClass(hasLettersAndNumbers(resetAnswer))}>
+						{hasLettersAndNumbers(resetAnswer) ? '✓' : '✗'} Security answer should include letters and numbers
+					</p>
 				</div>
 				<button type="submit" class="rounded-xl bg-straw-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-straw-600 transition-colors">
 					Create account →
