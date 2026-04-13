@@ -1,6 +1,6 @@
 export const MIN_PASSWORD_LENGTH = 12;
 export const MIN_RESET_ANSWER_LENGTH = 3;
-export const MIN_PASSWORD_AGE_MS = 24 * 60 * 60 * 1000;
+export const MIN_PASSWORD_AGE_MS = 3 * 60 * 1000;
 
 const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/;
 const RESET_ANSWER_POLICY = /^(?=.*[A-Za-z])(?=.*\d).+$/;
