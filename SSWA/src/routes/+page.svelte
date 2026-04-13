@@ -80,13 +80,22 @@
 				<!-- Account section -->
 				<div class="grid gap-2">
 					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Account</p>
-					<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
-						<div>
-							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
-							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
-						</div>
-						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
-					</a>
+					<div class="grid grid-cols-2 gap-3">
+						<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+						<a href="/forgot-password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Recovery</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Forgot Password</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+					</div>
 				</div>
 
 			{:else if data.user.role === 'MANAGER'}
@@ -109,13 +118,22 @@
 				<!-- Account section -->
 				<div class="grid gap-2">
 					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Account</p>
-					<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
-						<div>
-							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
-							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
-						</div>
-						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
-					</a>
+					<div class="grid grid-cols-2 gap-3">
+						<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+						<a href="/forgot-password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Recovery</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Forgot Password</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+					</div>
 				</div>
 
 			{:else if data.user.role === 'ADMIN'}
@@ -143,24 +161,42 @@
 				<!-- Manage section -->
 				<div class="grid gap-2">
 					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Manage</p>
-					<a href="/manager/orders" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
-						<div>
-							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Orders</p>
-							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">All Orders</p>
-						</div>
-						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
-					</a>
+					<div class="grid grid-cols-2 gap-3">
+						<a href="/manager/orders" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Orders</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">All Orders</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+						<a href="/manager/users" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Users</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">User Management</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+					</div>
 				</div>
 				<!-- Account section -->
 				<div class="grid gap-2">
 					<p class="text-xs font-semibold uppercase tracking-widest text-choc-600 px-1">Account</p>
-					<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
-						<div>
-							<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
-							<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
-						</div>
-						<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
-					</a>
+					<div class="grid grid-cols-2 gap-3">
+						<a href="/account/password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Security</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Change Password</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+						<a href="/forgot-password" class="rounded-2xl bg-van-50 border-2 border-van-200 p-4 hover:border-choc-600 transition-colors group flex items-center justify-between">
+							<div>
+								<p class="text-xs font-semibold uppercase tracking-widest text-choc-600">Recovery</p>
+								<p class="mt-0.5 text-sm font-bold text-choc-800 group-hover:text-straw-500 transition-colors">Forgot Password</p>
+							</div>
+							<span class="text-choc-600 group-hover:text-straw-500 transition-colors font-bold">→</span>
+						</a>
+					</div>
 				</div>
 			{/if}
 		{/if}
